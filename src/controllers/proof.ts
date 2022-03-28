@@ -5,6 +5,6 @@ import ProofBody from '@/validators/ProofBody'
 export default class ProofController {
   @Post('/')
   proof(@Body({ required: true }) { leaf }: ProofBody) {
-    return { success: true, leaf }
+    return { leaf }
   }
 }
