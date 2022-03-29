@@ -1,15 +1,12 @@
 import * as fs from 'fs'
 import * as snarkjs from 'snarkjs'
 import { Body, Controller, Post } from 'amala'
-import createInput from '@/helpers/createInput'
 import ProofBody from '@/validators/ProofBody'
 
 @Controller('/proof')
 export default class ProofController {
   @Post('/')
-  async proof(@Body({ required: true }) { leaf }: ProofBody) {
-    const input = await createInput(leaf)
-
+  async proof(@Body({ required: true }) input: ProofBody) {
     console.log('Generating witness and creating proof!')
 
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
