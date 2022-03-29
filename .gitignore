@@ -2,6 +2,9 @@
 node_modules
 *.log
 dist
+street-cred-derivatives-contract
+pot
+build
 
 # yarn
 .pnp.*

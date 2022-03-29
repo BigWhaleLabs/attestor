@@ -19,9 +19,11 @@
     "amala": "^8.0.2",
     "dotenv": "^16.0.0",
     "envalid": "^7.3.0",
+    "ffjavascript": "^0.2.51",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
-    "koa-router": "^10.1.1"
+    "koa-router": "^10.1.1",
+    "snarkjs": "^0.4.15"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",
