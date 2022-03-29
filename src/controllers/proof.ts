@@ -8,7 +8,7 @@ import ProofBody from '@/validators/ProofBody'
 export default class ProofController {
   @Post('/')
   async proof(@Body({ required: true }) input: ProofBody) {
-    console.log('connected!')
+    console.log('Generating witness and creating proof!')
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
       input,
       './build/OwnershipChecker_js/OwnershipChecker.wasm',
@@ -16,7 +16,7 @@ export default class ProofController {
     )
 
     // const genCalldata = await genSolidityCalldata(publicSignals, proof)
-
+    console.log('Verifying proof!')
     const vKey = JSON.parse(
       fs.readFileSync('./pot/verification_key.json').toString()
     )
