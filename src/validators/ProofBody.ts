@@ -1,4 +1,4 @@
-import { IsArray, IsString } from 'amala'
+import { IsString } from 'amala'
 
 export default class ProofBody {
   @IsString()

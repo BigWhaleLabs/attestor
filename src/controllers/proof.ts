@@ -1,8 +1,8 @@
-import { Body, Controller, Post } from 'amala'
-import * as snarkjs from 'snarkjs'
 import * as fs from 'fs'
-import ProofBody from '@/validators/ProofBody'
+import * as snarkjs from 'snarkjs'
+import { Body, Controller, Post } from 'amala'
 import createInput from '@/helpers/createInput'
+import ProofBody from '@/validators/ProofBody'
 // import genSolidityCalldata from '@/helpers/circuitCalldata'
 
 @Controller('/proof')

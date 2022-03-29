@@ -1,12 +1,11 @@
 import 'module-alias/register'
 import 'source-map-support/register'
 
+import * as keccak256 from 'keccak256'
+import { Point, sign } from '@noble/secp256k1'
+import { MsgInput } from '@/types/msgInput'
 import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
 import { poseidon } from 'circomlibjs'
-
-import { MsgInput } from '@/types/msgInput'
-import { sign, Point } from '@noble/secp256k1'
-import * as keccak256 from 'keccak256'
 
 const addresses = [
   '0x525A7a36009AAfCB2dE1dd239a257aae84ED585B',
@@ -60,7 +59,7 @@ const createMerkleProof = (leaf: string) => {
 
 // bigendian
 const bigint_to_Uint8Array = (x: bigint) => {
-  let ret = new Uint8Array(32)
+  const ret = new Uint8Array(32)
   for (let idx = 31; idx >= 0; idx--) {
     ret[idx] = Number(x % BigInt(256))
     x = x / BigInt(256)
@@ -76,8 +75,8 @@ const createMsgInput = async (leaf: string): Promise<MsgInput | undefined> => {
 
     const bigint_to_tuple = (x: bigint) => {
       // 2 ** 86
-      let mod = BigInt('77371252455336267181195264')
-      let ret = [BigInt(0), BigInt(0), BigInt(0)]
+      const mod = BigInt('77371252455336267181195264')
+      const ret = [BigInt(0), BigInt(0), BigInt(0)]
 
       let x_temp = x
       for (let idx = 0; idx < 3; idx++) {
@@ -93,7 +92,7 @@ const createMsgInput = async (leaf: string): Promise<MsgInput | undefined> => {
         mod = mod * BigInt(2)
       }
 
-      let ret = []
+      const ret = []
       let x_temp = x
       for (let idx = 0; idx < k; idx++) {
         ret.push(x_temp % mod)
@@ -122,11 +121,11 @@ const createMsgInput = async (leaf: string): Promise<MsgInput | undefined> => {
     })
     const r = sig.slice(0, 32)
     const s = sig.slice(32, 64)
-    let r_bigint = Uint8Array_to_bigint(r)
-    let s_bigint = Uint8Array_to_bigint(s)
-    let r_array = bigint_to_array(86, 3, r_bigint)
-    let s_array = bigint_to_array(86, 3, s_bigint)
-    let msghash_array = bigint_to_array(86, 3, msghash_bigint)
+    const r_bigint = Uint8Array_to_bigint(r)
+    const s_bigint = Uint8Array_to_bigint(s)
+    const r_array = bigint_to_array(86, 3, r_bigint)
+    const s_array = bigint_to_array(86, 3, s_bigint)
+    const msghash_array = bigint_to_array(86, 3, msghash_bigint)
     test_cases.push([
       proverPrivkey,
       msghash_bigint,
