@@ -2,9 +2,9 @@ import 'module-alias/register'
 import 'source-map-support/register'
 
 import * as keccak256 from 'keccak256'
-import { Point, sign } from '@noble/secp256k1'
-import { MsgInput } from '@/types/msgInput'
 import { IncrementalMerkleTree } from '@zk-kit/incremental-merkle-tree'
+import { MsgInput } from '@/types/msgInput'
+import { Point, sign } from '@noble/secp256k1'
 import { poseidon } from 'circomlibjs'
 
 const addresses = [

@@ -3,6 +3,10 @@ import * as snarkjs from 'snarkjs'
 import { Body, Controller, Post } from 'amala'
 import ProofBody from '@/validators/ProofBody'
 
+const vKey = JSON.parse(
+  fs.readFileSync('./pot/verification_key.json').toString()
+)
+
 @Controller('/proof')
 export default class ProofController {
   @Post('/')
@@ -16,9 +20,6 @@ export default class ProofController {
     )
 
     console.log('Verifying proof!')
-    const vKey = JSON.parse(
-      fs.readFileSync('./pot/verification_key.json').toString()
-    )
     const res = await snarkjs.groth16.verify(vKey, publicSignals, proof)
 
     if (res) {
