@@ -4,6 +4,15 @@ POST http://localhost:1337/proof HTTP/1.1
 content-type: application/json
 
 {
+  "leaf": "0x7877dF1504a7909f98c74cc30a87526F86df47cB"
+}
+
+###
+
+POST http://localhost:1337/proof HTTP/1.1
+content-type: application/json
+
+{
   "root": "18056514497589936900896009091357527481386505948067853291440513722193770029289",
   "leaf": "0x7877dF1504a7909f98c74cc30a87526F86df47cB",
   "pathIndices": [1, 0, 0, 1, 0, 0, 0,
@@ -95,3 +104,4 @@ content-type: application/json
 		]
 	]
 }
+

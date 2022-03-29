@@ -16,14 +16,21 @@
   "dependencies": {
     "@hapi/boom": "^9.1.4",
     "@koa/cors": "^3.2.0",
+    "@noble/secp256k1": "^1.5.5",
+    "@zk-kit/incremental-merkle-tree": "^0.4.3",
     "amala": "^8.0.2",
+    "blake-hash": "^2.0.0",
+    "blake2b": "^2.1.4",
     "dotenv": "^16.0.0",
     "envalid": "^7.3.0",
+    "ethers": "^5.6.2",
     "ffjavascript": "^0.2.51",
+    "keccak256": "^1.0.6",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.1.1",
-    "snarkjs": "^0.4.15"
+    "snarkjs": "^0.4.15",
+    "web3-utils": "^1.7.1"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",

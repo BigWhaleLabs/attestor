@@ -2,13 +2,17 @@ import { Body, Controller, Post } from 'amala'
 import * as snarkjs from 'snarkjs'
 import * as fs from 'fs'
 import ProofBody from '@/validators/ProofBody'
+import createInput from '@/helpers/createInput'
 // import genSolidityCalldata from '@/helpers/circuitCalldata'
 
 @Controller('/proof')
 export default class ProofController {
   @Post('/')
-  async proof(@Body({ required: true }) input: ProofBody) {
+  async proof(@Body({ required: true }) { leaf }: ProofBody) {
+    const input = await createInput(leaf)
+
     console.log('Generating witness and creating proof!')
+
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
       input,
       './build/OwnershipChecker_js/OwnershipChecker.wasm',
