@@ -3,6 +3,10 @@ node_modules
 *.log
 dist
 
+build/*
+!build/.gitkeep
+pot
+
 # yarn
 .pnp.*
 .yarn/*
