@@ -2,9 +2,10 @@
 node_modules
 *.log
 dist
-street-cred-derivatives-contract
+
+build/*
+!build/.gitkeep
 pot
-build
 
 # yarn
 .pnp.*

@@ -3,7 +3,6 @@ import * as snarkjs from 'snarkjs'
 import { Body, Controller, Post } from 'amala'
 import createInput from '@/helpers/createInput'
 import ProofBody from '@/validators/ProofBody'
-// import genSolidityCalldata from '@/helpers/circuitCalldata'
 
 @Controller('/proof')
 export default class ProofController {
@@ -19,7 +18,6 @@ export default class ProofController {
       './pot/OwnershipChecker_final.zkey'
     )
 
-    // const genCalldata = await genSolidityCalldata(publicSignals, proof)
     console.log('Verifying proof!')
     const vKey = JSON.parse(
       fs.readFileSync('./pot/verification_key.json').toString()
