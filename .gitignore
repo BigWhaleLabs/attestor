@@ -3,8 +3,6 @@ node_modules
 *.log
 dist
 
-build/*
-!build/.gitkeep
 pot/OwnershipChecker_final.zkey
 
 # yarn
