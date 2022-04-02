@@ -30,5 +30,6 @@ export default async function () {
         resolve(connection)
       })
       .on('error', reject)
+    connection.timeout = 3000 * 60 * 1000
   })
 }
