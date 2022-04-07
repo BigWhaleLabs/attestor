@@ -4,7 +4,7 @@ import JobStatus from '@/models/JobStatus'
 import Proof from '@/models/Proof'
 
 @modelOptions({
-  schemaOptions: { timestamps: true },
+  schemaOptions: { timestamps: true, expireAfterSeconds: 24 * 60 * 60 * 1000 },
 })
 export class Job {
   @prop({
