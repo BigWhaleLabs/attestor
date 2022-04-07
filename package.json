@@ -29,10 +29,12 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.1.1",
+    "mongoose": "^6.2.10",
     "snarkjs": "^0.4.16",
     "web3-utils": "^1.7.1"
   },
   "devDependencies": {
+    "@typegoose/typegoose": "^9.7.1",
     "@types/koa": "^2.13.4",
     "@types/koa-bodyparser": "^4.3.7",
     "@types/koa-router": "^7.4.4",

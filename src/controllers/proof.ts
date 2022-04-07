@@ -1,33 +1,34 @@
-import * as fs from 'fs'
-import * as snarkjs from 'snarkjs'
-import { Body, Controller, Post } from 'amala'
-import ProofBody from '@/validators/ProofBody'
-
-const vKey = JSON.parse(
-  fs.readFileSync('./pot/verification_key.json').toString()
-)
+import { Body, Controller, Ctx, Get, Params, Post } from 'amala'
+import { Context } from 'koa'
+import { Job, JobModel } from '@/models/Job'
+import { notFound } from '@hapi/boom'
+import InputBody from '@/validators/InputBody'
+import JobStatus from '@/models/JobStatus'
+import ProofResultParams from '@/validators/ProofResultParams'
 
 @Controller('/proof')
 export default class ProofController {
   @Post('/')
-  async proof(@Body({ required: true }) input: ProofBody) {
-    console.log('Generating witness and creating proof!')
+  async proof(@Body({ required: true }) input: InputBody) {
+    const job = await JobModel.create({ input })
+    job.input = undefined
+    return job
+  }
 
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-      input,
-      './build/OwnershipChecker_js/OwnershipChecker.wasm',
-      './pot/OwnershipChecker_final.zkey'
-    )
-
-    console.log('Verifying proof!')
-    const res = await snarkjs.groth16.verify(vKey, publicSignals, proof)
-
-    if (res) {
-      console.log('Verified!')
-    } else {
-      console.log('Invalid proof')
+  @Get('/:id')
+  async status(@Ctx() ctx: Context, @Params() { id }: ProofResultParams) {
+    const job = await JobModel.findById(id)
+    if (!job) {
+      return ctx.throw(notFound())
     }
-
-    return proof
+    job.input = undefined
+    const result: { job: Job; position?: number } = { job }
+    if (job.status === JobStatus.scheduled) {
+      result.position = await JobModel.countDocuments({
+        status: JobStatus.scheduled,
+        createdAt: { $lt: job.createdAt },
+      })
+    }
+    return result
   }
 }

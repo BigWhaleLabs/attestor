@@ -1,6 +1,6 @@
 import { IsArray, IsString } from 'amala'
 
-export default class ProofBody {
+export default class InputBody {
   @IsString()
   root!: string
 
