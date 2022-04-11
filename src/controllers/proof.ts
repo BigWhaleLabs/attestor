@@ -28,6 +28,6 @@ export default class ProofController {
       console.log('Invalid proof')
     }
 
-    return proof
+    return { proof, publicSignals }
   }
 }
