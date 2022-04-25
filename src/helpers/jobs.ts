@@ -44,8 +44,10 @@ async function checkAndRunJobs() {
     const { proof, publicSignals } = await runJob(scheduledJob)
     await scheduledJob.update({
       status: JobStatus.completed,
-      proof,
-      publicSignals,
+      result: {
+        proof,
+        publicSignals,
+      },
       $unset: { input: true },
     })
   } catch (error) {
