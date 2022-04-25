@@ -1,7 +1,6 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
 import InputBody from '@/validators/InputBody'
 import JobStatus from '@/models/JobStatus'
-import Proof from '@/models/Proof'
 
 @modelOptions({
   schemaOptions: { timestamps: true, expireAfterSeconds: 24 * 60 * 60 * 1000 },
@@ -17,7 +16,9 @@ export class Job {
   @prop()
   input?: InputBody
   @prop()
-  proof?: Proof
+  proof?: unknown
+  @prop()
+  publicSignals?: unknown
 
   // Mongo fields
   createdAt?: Date

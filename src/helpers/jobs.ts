@@ -41,10 +41,11 @@ async function checkAndRunJobs() {
     await scheduledJob.update({
       status: JobStatus.running,
     })
-    const proof = await runJob(scheduledJob)
+    const { proof, publicSignals } = await runJob(scheduledJob)
     await scheduledJob.update({
       status: JobStatus.completed,
       proof,
+      publicSignals,
       $unset: { input: true },
     })
   } catch (error) {
@@ -74,5 +75,5 @@ async function runJob(job: DocumentType<Job>) {
     throw new Error('Proof verification failed')
   }
   console.log(`Proof verified for job ${job.id}`)
-  return proof
+  return { proof, publicSignals }
 }
