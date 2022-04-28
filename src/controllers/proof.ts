@@ -10,10 +10,7 @@ import ProofResultParams from '@/validators/ProofResultParams'
 export default class ProofController {
   @Post('/')
   async proof(@Body({ required: true }) input: InputBody) {
-    console.log(JSON.stringify(input, undefined, 2))
-    console.log(JSON.stringify({ input }, undefined, 2))
     const job = await JobModel.create({ input })
-    console.log(job)
     job.input = undefined
     return job
   }

@@ -1,5 +1,4 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
-import InputBody from '@/validators/InputBody'
 import JobStatus from '@/models/JobStatus'
 import ProofResponse from '@/models/ProofResponse'
 
