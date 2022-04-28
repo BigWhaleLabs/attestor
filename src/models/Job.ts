@@ -15,7 +15,7 @@ export class Job {
   })
   status!: JobStatus
   @prop({ _id: false })
-  input?: InputBody
+  input?: unknown
   @prop()
   result?: ProofResponse
 
