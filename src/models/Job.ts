@@ -14,7 +14,7 @@ export class Job {
     default: JobStatus.scheduled,
   })
   status!: JobStatus
-  @prop()
+  @prop({ _id: false })
   input?: InputBody
   @prop()
   result?: ProofResponse
