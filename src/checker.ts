@@ -1,13 +1,16 @@
 import 'module-alias/register'
 import 'source-map-support/register'
 
-import runApp from '@/helpers/runApp'
+import cleanJobs from '@/helpers/cleanJobs'
 import runMongo from '@/helpers/mongo'
+import startJobChecker from '@/helpers/jobs'
 
 void (async () => {
   console.log('Starting mongo...')
   await runMongo()
-  console.log('Starting app...')
-  await runApp()
+  console.log('Cleaning jobs...')
+  await cleanJobs()
+  console.log('Start checking jobs...')
+  startJobChecker()
   console.log('Launch sequence completed 🚀')
 })()
