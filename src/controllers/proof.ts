@@ -12,7 +12,14 @@ export default class ProofController {
   async proof(@Body({ required: true }) input: InputBody) {
     const job = await JobModel.create({ input })
     job.input = undefined
-    return job
+    const result: { job: Job; position?: number } = { job }
+    if (job.status === JobStatus.scheduled) {
+      result.position = await JobModel.countDocuments({
+        status: JobStatus.scheduled,
+        createdAt: { $lt: job.createdAt },
+      })
+    }
+    return result
   }
 
   @Get('/:id')
