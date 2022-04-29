@@ -1,8 +1,8 @@
 import 'module-alias/register'
 import 'source-map-support/register'
 
+import Cluster from '@/helpers/Cluster'
 import cleanJobs from '@/helpers/cleanJobs'
-import cluster from 'cluster'
 import runApp from '@/helpers/runApp'
 import runMongo from '@/helpers/mongo'
 import startJobChecker from '@/helpers/jobs'
@@ -17,11 +17,11 @@ void (async () => {
   console.log('Launch sequence completed 🚀')
 })()
 
-if (cluster.isPrimary) {
+if (Cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`)
-  cluster.fork()
+  Cluster.fork()
 
-  cluster.on('exit', (worker) => {
+  Cluster.on('exit', (worker) => {
     console.log(`worker ${worker.process.pid} died`)
   })
 } else {
