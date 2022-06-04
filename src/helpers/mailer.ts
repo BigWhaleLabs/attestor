@@ -1,5 +1,5 @@
 import * as ed from '@noble/ed25519'
-import { ImapFlow, MailboxLockObject } from 'imapflow'
+import { FetchMessageObject, ImapFlow, MailboxLockObject } from 'imapflow'
 import { createTransport } from 'nodemailer'
 import env from '@/helpers/env'
 
@@ -33,28 +33,25 @@ async function check() {
     return
   }
   checking = true
+  await client.connect()
   let lock: MailboxLockObject | undefined
   try {
     console.log('Checking for new messages...')
     lock = await client.getMailboxLock('INBOX')
-    const result = client.fetch(
-      { seen: false },
-      {
-        envelope: true,
-        source: false,
-        bodyStructure: true,
-        uid: true,
-      }
-    )
-    for await (const msg of result) {
-      const address = msg.envelope.from[0].address
+    const result = client.fetch('1:*', {
+      envelope: true,
+      source: false,
+      bodyStructure: true,
+      uid: true,
+    })
+    const messages = [] as FetchMessageObject[]
+    for await (const message of result) {
+      const address = message.envelope.from[0].address
       if (!address) {
         return
       }
-      const key = ed.utils.randomPrivateKey()
-      console.log(key)
       const hexMessage = Buffer.from(address, 'utf8').toString('hex')
-      const signature = await ed.sign(hexMessage, key)
+      const signature = await ed.sign(hexMessage, env.EDDSA_PRIVATE_KEY)
       const signatureHexString = Buffer.from(signature).toString('hex')
       console.log(`Replying to ${address}, ${signatureHexString}`)
       await transporter.sendMail({
@@ -63,16 +60,19 @@ async function check() {
         subject: "Here's your token!",
         text: `Your token is: ${signatureHexString}`,
       })
-      await client.messageFlagsAdd(`${msg.uid}`, ['\\Seen'])
+      messages.push(message)
     }
+    await Promise.all(
+      messages.map((message) => client.messageDelete(`${message.uid}`))
+    )
   } finally {
     lock?.release()
+    await client.logout()
     checking = false
   }
 }
 
 export default async function setupMailer() {
-  await client.connect()
   await check()
   setInterval(check, 1000 * 5)
 }

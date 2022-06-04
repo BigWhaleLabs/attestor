@@ -11,4 +11,5 @@ export default cleanEnv(process.env, {
   MONGO: str(),
   SMTP_USER: str(),
   SMTP_PASS: str(),
+  EDDSA_PRIVATE_KEY: str(),
 })

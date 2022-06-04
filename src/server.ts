@@ -12,5 +12,5 @@ void (async () => {
   await runApp()
   console.log('Setting up mailer...')
   await setupMailer()
-  console.log('Launch sequence completed 🚀')
+  console.log('Server launch sequence completed 🚀')
 })()

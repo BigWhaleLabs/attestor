@@ -12,5 +12,5 @@ void (async () => {
   await cleanJobs()
   console.log('Start checking jobs...')
   startJobChecker()
-  console.log('Launch sequence completed 🚀')
+  console.log('Checker launch sequence completed 🚀')
 })()

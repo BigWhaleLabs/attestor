@@ -15,9 +15,12 @@ And you should be good to go! Feel free to fork and submit pull requests.
 
 ## Environment variables
 
-| Name    | Description                              |
-| ------- | ---------------------------------------- |
-| `PORT`  | Port to run server on (defaults to 1337) |
-| `MONGO` | MongoDB connection string                |
+| Name                | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `PORT`              | Port to run server on (defaults to 1337)               |
+| `MONGO`             | MongoDB connection string                              |
+| `SMTP_USER`         | Email user for the email verification echo service     |
+| `SMTP_PASS`         | Email password for the email verification echo service |
+| `EDDSA_PRIVATE_KEY` | EdDSA private key to sign attestations                 |
 
 Also, please, consider looking at `.env.sample`.
