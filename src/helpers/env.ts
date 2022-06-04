@@ -9,4 +9,6 @@ dotenv.config({ path: resolve(cwd(), '.env') })
 export default cleanEnv(process.env, {
   PORT: num({ default: 1337 }),
   MONGO: str(),
+  SMTP_USER: str(),
+  SMTP_PASS: str(),
 })

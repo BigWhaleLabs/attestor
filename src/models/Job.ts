@@ -1,9 +1,17 @@
-import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
+import {
+  Severity,
+  getModelForClass,
+  modelOptions,
+  prop,
+} from '@typegoose/typegoose'
 import JobStatus from '@/models/JobStatus'
 import ProofResponse from '@/models/ProofResponse'
 
 @modelOptions({
   schemaOptions: { timestamps: true, expireAfterSeconds: 24 * 60 * 60 * 1000 },
+  options: {
+    allowMixed: Severity.ALLOW,
+  },
 })
 export class Job {
   @prop({
