@@ -17,6 +17,8 @@
     "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
+    "@big-whale-labs/constants": "^0.0.8",
+    "@big-whale-labs/seal-cred-ledger-contract": "^0.0.3",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^3.3.0",
     "@noble/ed25519": "^1.6.0",
@@ -27,7 +29,7 @@
     "blake2b": "^2.1.4",
     "dotenv": "^16.0.0",
     "envalid": "^7.3.1",
-    "ethers": "^5.6.5",
+    "ethers": "^5.6.8",
     "ffjavascript": "^0.2.52",
     "imapflow": "^1.0.98",
     "keccak256": "^1.0.6",

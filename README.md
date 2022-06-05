@@ -15,12 +15,14 @@ And you should be good to go! Feel free to fork and submit pull requests.
 
 ## Environment variables
 
-| Name                | Description                                            |
-| ------------------- | ------------------------------------------------------ |
-| `PORT`              | Port to run server on (defaults to 1337)               |
-| `MONGO`             | MongoDB connection string                              |
-| `SMTP_USER`         | Email user for the email verification echo service     |
-| `SMTP_PASS`         | Email password for the email verification echo service |
-| `EDDSA_PRIVATE_KEY` | EdDSA private key to sign attestations                 |
+| Name                | Description                                        |
+| ------------------- | -------------------------------------------------- |
+| `PORT`              | Port to run server on (defaults to 1337)           |
+| `MONGO`             | MongoDB connection string                          |
+| `SMTP_USER`         | SMTP username for email verification               |
+| `SMTP_PASS`         | SMTP password for email verification               |
+| `EDDSA_PRIVATE_KEY` | EdDSA private key for signing the attestations     |
+| `ETH_NETWORK`       | Ethereum network (defaults to @bwl/constants)      |
+| `ETH_RPC`           | Ethereum node RPC URI (defaults to @bwl/constants) |
 
 Also, please, consider looking at `.env.sample`.

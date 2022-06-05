@@ -1,6 +1,6 @@
 import { IsArray, IsString } from 'amala'
 
-export default class InputBody {
+export default class {
   @IsString()
   root!: string
   @IsString()
@@ -9,12 +9,4 @@ export default class InputBody {
   pathIndices!: Array<number>
   @IsArray()
   siblings!: Array<Array<string>>
-  @IsArray()
-  r!: Array<string>
-  @IsArray()
-  s!: Array<string>
-  @IsArray()
-  msghash!: Array<string>
-  @IsArray()
-  pubkey!: Array<Array<string>>
 }

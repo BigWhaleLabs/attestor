@@ -1,6 +1,6 @@
 import { IsMongoId } from 'amala'
 
-export default class ProofResultParams {
+export default class {
   @IsMongoId()
   id!: string
 }
