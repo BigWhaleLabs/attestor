@@ -7,6 +7,7 @@ import { ERC721__factory } from '@big-whale-labs/seal-cred-ledger-contract'
 import { badRequest } from '@hapi/boom'
 import ECDSASigBody from '@/validators/ECDSASigBody'
 import TokenOwnershipBody from '@/validators/TokenOwnershipBody'
+import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 import provider from '@/helpers/provider'
 
@@ -55,12 +56,8 @@ export default class VerifyController {
       return ctx.throw(badRequest('Token not owned'))
     }
     // Generate EDDSA signature
-    const hexMessage = Buffer.from(
-      `${ownerAddress}-owns-${tokenAddress}`,
-      'utf8'
-    ).toString('hex')
-    const signature = await ed.sign(hexMessage, env.EDDSA_PRIVATE_KEY)
-    const signatureHexString = Buffer.from(signature).toString('hex')
-    return { signature: signatureHexString }
+    return {
+      signature: eddsaSigFromString(`${ownerAddress}-owns-${tokenAddress}`),
+    }
   }
 }

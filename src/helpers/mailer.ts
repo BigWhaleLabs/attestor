@@ -1,6 +1,6 @@
-import * as ed from '@noble/ed25519'
 import { FetchMessageObject, ImapFlow } from 'imapflow'
 import { createTransport } from 'nodemailer'
+import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 
 const user = env.SMTP_USER
@@ -49,9 +49,7 @@ async function check() {
         if (!address) {
           return
         }
-        const hexMessage = Buffer.from(address, 'utf8').toString('hex')
-        const signature = await ed.sign(hexMessage, env.EDDSA_PRIVATE_KEY)
-        const signatureHexString = Buffer.from(signature).toString('hex')
+        const signatureHexString = eddsaSigFromString(address)
         console.log(`Replying to ${address}, ${signatureHexString}`)
         await transporter.sendMail({
           from: `"SealCred" <${user}>`,
