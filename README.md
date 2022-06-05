@@ -1,4 +1,4 @@
-# Signature generator
+# Credentials attestor
 
 Node server that generates EDDSA signatures as attestations for a specific credential.
 
