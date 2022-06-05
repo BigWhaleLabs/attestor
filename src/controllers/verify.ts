@@ -1,4 +1,6 @@
 import * as ed from '@noble/ed25519'
+import * as secp256k1 from '@noble/secp256k1'
+import { BigNumber } from 'ethers'
 import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
 import { ERC721__factory } from '@big-whale-labs/seal-cred-ledger-contract'
@@ -24,15 +26,41 @@ export default class VerifyController {
   async erc721(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress, ownerAddress }: ECDSASigBody & TokenOwnershipBody
+    {
+      tokenAddress,
+      ownerAddress,
+      r,
+      s,
+      msghash,
+      pubkey,
+    }: ECDSASigBody & TokenOwnershipBody
   ) {
+    // Verify ECDSA signature
+    if (
+      !secp256k1.verify(
+        new secp256k1.Signature(
+          BigNumber.from(r).toBigInt(),
+          BigNumber.from(s).toBigInt()
+        ),
+        msghash,
+        pubkey
+      )
+    ) {
+      return ctx.throw(badRequest('Wrong ECDSA signature'))
+    }
+    // Verify ownership
     const contract = ERC721__factory.connect(tokenAddress, provider)
     const balance = await contract.balanceOf(ownerAddress)
     if (balance.lte(0)) {
       return ctx.throw(badRequest('Token not owned'))
     }
-    // TODO: Verify the ECDSA signature
-    // TODO: Sign with EDDSA
-    return { success: false }
+    // Generate EDDSA signature
+    const hexMessage = Buffer.from(
+      `${ownerAddress}-owns-${tokenAddress}`,
+      'utf8'
+    ).toString('hex')
+    const signature = await ed.sign(hexMessage, env.EDDSA_PRIVATE_KEY)
+    const signatureHexString = Buffer.from(signature).toString('hex')
+    return { signature: signatureHexString }
   }
 }

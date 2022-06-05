@@ -1,5 +1,5 @@
 import * as ed from '@noble/ed25519'
-import { FetchMessageObject, ImapFlow, MailboxLockObject } from 'imapflow'
+import { FetchMessageObject, ImapFlow } from 'imapflow'
 import { createTransport } from 'nodemailer'
 import env from '@/helpers/env'
 

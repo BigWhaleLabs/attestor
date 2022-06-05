@@ -2,11 +2,11 @@ import { IsArray } from 'amala'
 
 export default class {
   @IsArray()
-  r!: Array<string>
+  r!: Uint8Array
   @IsArray()
-  s!: Array<string>
+  s!: Uint8Array
   @IsArray()
-  msghash!: Array<string>
+  msghash!: Uint8Array
   @IsArray()
-  pubkey!: Array<Array<string>>
+  pubkey!: Uint8Array
 }
