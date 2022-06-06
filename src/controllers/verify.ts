@@ -1,12 +1,10 @@
 import * as ed from '@noble/ed25519'
-import * as secp256k1 from '@noble/secp256k1'
-import { BigNumber } from 'ethers'
 import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
 import { ERC721__factory } from '@big-whale-labs/seal-cred-ledger-contract'
 import { badRequest } from '@hapi/boom'
-import ECDSASigBody from '@/validators/ECDSASigBody'
-import TokenOwnershipBody from '@/validators/TokenOwnershipBody'
+import { ethers } from 'ethers'
+import ERC721VerifyBody from '@/validators/ERC721VerifyBody'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 import provider from '@/helpers/provider'
@@ -27,28 +25,10 @@ export default class VerifyController {
   async erc721(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    {
-      tokenAddress,
-      ownerAddress,
-      r,
-      s,
-      msghash,
-      pubkey,
-    }: ECDSASigBody & TokenOwnershipBody
+    { tokenAddress, signature, message }: ERC721VerifyBody
   ) {
     // Verify ECDSA signature
-    if (
-      !secp256k1.verify(
-        new secp256k1.Signature(
-          BigNumber.from(r).toBigInt(),
-          BigNumber.from(s).toBigInt()
-        ),
-        msghash,
-        pubkey
-      )
-    ) {
-      return ctx.throw(badRequest('Wrong ECDSA signature'))
-    }
+    const ownerAddress = ethers.utils.verifyMessage(message, signature)
     // Verify ownership
     const contract = ERC721__factory.connect(tokenAddress, provider)
     const balance = await contract.balanceOf(ownerAddress)
@@ -56,8 +36,10 @@ export default class VerifyController {
       return ctx.throw(badRequest('Token not owned'))
     }
     // Generate EDDSA signature
+    const eddsaMessage = `${ownerAddress}-owns-${tokenAddress}`
     return {
-      signature: eddsaSigFromString(`${ownerAddress}-owns-${tokenAddress}`),
+      signature: await eddsaSigFromString(eddsaMessage),
+      message: eddsaMessage,
     }
   }
 }

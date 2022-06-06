@@ -503,13 +503,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/secp256k1@npm:^1.5.5":
-  version: 1.5.5
-  resolution: "@noble/secp256k1@npm:1.5.5"
-  checksum: 8a144e8469b29e94107ca4bcf442fc5d9410974239f8e42013f8604d602ab73cfc0c113c24170d41c25e2c40d6d1c46319c439c3bc26a7581c79060fabc3ea8c
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1031,7 +1024,6 @@ __metadata:
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
     "@noble/ed25519": ^1.6.0
-    "@noble/secp256k1": ^1.5.5
     "@types/imapflow": ^1.0.9
     "@types/koa": ^2.13.4
     "@types/koa-bodyparser": ^4.3.7
