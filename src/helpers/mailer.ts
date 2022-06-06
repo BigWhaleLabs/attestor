@@ -49,7 +49,7 @@ async function check() {
         if (!address) {
           return
         }
-        const signatureHexString = eddsaSigFromString(address)
+        const signatureHexString = await eddsaSigFromString(address)
         console.log(`Replying to ${address}, ${signatureHexString}`)
         await transporter.sendMail({
           from: `"SealCred" <${user}>`,
