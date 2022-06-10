@@ -1,7 +1,7 @@
 import { FetchMessageObject, ImapFlow } from 'imapflow'
-import { createTransport } from 'nodemailer'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
+import sendEmail from '@/helpers/sendEmail'
 
 const user = env.SMTP_USER
 const pass = env.SMTP_PASS
@@ -15,16 +15,6 @@ const client = new ImapFlow({
     pass,
   },
   logger: false,
-})
-
-const transporter = createTransport({
-  host: 'box.mail.sealcred.xyz',
-  port: 465,
-  secure: true,
-  auth: {
-    user,
-    pass,
-  },
 })
 
 let checking = false
@@ -51,12 +41,11 @@ async function check() {
         }
         const signatureHexString = await eddsaSigFromString(address)
         console.log(`Replying to ${address}, ${signatureHexString}`)
-        await transporter.sendMail({
-          from: `"SealCred" <${user}>`,
-          to: address,
-          subject: "Here's your token!",
-          text: `Your token is: ${signatureHexString}`,
-        })
+        await sendEmail(
+          address,
+          "Here's your token!",
+          `Your token is: ${signatureHexString}`
+        )
         messages.push(message)
       }
       await Promise.all(
@@ -72,7 +61,7 @@ async function check() {
   }
 }
 
-export default async function setupMailer() {
+export default async function () {
   await client.connect()
   await check()
   setInterval(check, 1000 * 5)
