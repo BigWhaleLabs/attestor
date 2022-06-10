@@ -1,13 +1,13 @@
+import { Entropy } from 'entropy-string'
 import { buildEddsa, buildMimc7 } from 'circomlibjs'
 import { utils } from 'ethers'
-import cryptoRandomString from 'crypto-random-string'
 import env from '@/helpers/env'
 
 export default async function (message: string) {
   // Message
-  const messageUInt8 = utils.toUtf8Bytes(
-    `${message}-${cryptoRandomString({ length: 6 })}`
-  )
+  const entropy = new Entropy()
+  const nullifier = entropy.string().substring(0, 6)
+  const messageUInt8 = utils.toUtf8Bytes(`${message}-${nullifier}`)
   const mimc7 = await buildMimc7()
   const M = mimc7.multiHash(messageUInt8)
   // EdDSA

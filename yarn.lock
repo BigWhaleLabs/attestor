@@ -5,6 +5,15 @@ __metadata:
   version: 5
   cacheKey: 8
 
+"@babel/runtime@npm:^7.4.5":
+  version: 7.18.3
+  resolution: "@babel/runtime@npm:7.18.3"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: db8526226aa02cfa35a5a7ac1a34b5f303c62a1f000c7db48cb06c6290e616483e5036ab3c4e7a84d0f3be6d4e2148d5fe5cec9564bf955f505c3e764b83d7f1
+  languageName: node
+  linkType: hard
+
 "@big-whale-labs/constants@npm:^0.0.10":
   version: 0.0.10
   resolution: "@big-whale-labs/constants@npm:0.0.10"
@@ -626,6 +635,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/entropy-string@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@types/entropy-string@npm:4.2.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 70e03d51ad5af4542dd9e3e1ca6dac99e18659cb8586430e40120047ac62d082608b7295907bc8310eea85409535a2a1495baef155f06c88b6e43c783763efc6
+  languageName: node
+  linkType: hard
+
 "@types/express-serve-static-core@npm:^4.17.18":
   version: 4.17.24
   resolution: "@types/express-serve-static-core@npm:4.17.24"
@@ -1121,6 +1139,7 @@ __metadata:
     "@big-whale-labs/seal-cred-ledger-contract": ^0.0.4
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
+    "@types/entropy-string": ^4.2.0
     "@types/imapflow": ^1.0.9
     "@types/koa": ^2.13.4
     "@types/koa-bodyparser": ^4.3.7
@@ -1132,8 +1151,8 @@ __metadata:
     "@typescript-eslint/parser": ^5.27.1
     amala: ^8.0.2
     circomlibjs: ^0.1.2
-    crypto-random-string: ^5.0.0
     dotenv: ^16.0.1
+    entropy-string: ^4.2.0
     envalid: ^7.3.1
     eslint: ^8.17.0
     eslint-config-prettier: ^8.5.0
@@ -1548,15 +1567,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-random-string@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "crypto-random-string@npm:5.0.0"
-  dependencies:
-    type-fest: ^2.12.2
-  checksum: 42c8ad00764e865c7c8975b82b21d3a5b482ceaf141f04d76afa5537c718705b1c2c28082c69e71dba10a6a161bcd4b778e49ec2dbf031bc16dba361d7d2c9c6
-  languageName: node
-  linkType: hard
-
 "debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.3, debug@npm:^4.3.4":
   version: 4.3.4
   resolution: "debug@npm:4.3.4"
@@ -1761,6 +1771,15 @@ __metadata:
   dependencies:
     once: ^1.4.0
   checksum: 530a5a5a1e517e962854a31693dbb5c0b2fc40b46dad2a56a2deec656ca040631124f4795823acc68238147805f8b021abbe221f4afed5ef3c8e8efc2024908b
+  languageName: node
+  linkType: hard
+
+"entropy-string@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "entropy-string@npm:4.2.0"
+  dependencies:
+    "@babel/runtime": ^7.4.5
+  checksum: 8cf1e27ded17baa5e3f7849378d52b17a885e99d1250dd6f4b82275efdde9bdddfb8f90713e7352e750d55ca913ccab5aca6a153d1c2d1034076159c11465662
   languageName: node
   linkType: hard
 
@@ -3907,6 +3926,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"regenerator-runtime@npm:^0.13.4":
+  version: 0.13.9
+  resolution: "regenerator-runtime@npm:0.13.9"
+  checksum: 65ed455fe5afd799e2897baf691ca21c2772e1a969d19bb0c4695757c2d96249eb74ee3553ea34a91062b2a676beedf630b4c1551cc6299afb937be1426ec55e
+  languageName: node
+  linkType: hard
+
 "regexpp@npm:^3.0.0, regexpp@npm:^3.2.0":
   version: 3.2.0
   resolution: "regexpp@npm:3.2.0"
@@ -4452,13 +4478,6 @@ __metadata:
   version: 0.20.2
   resolution: "type-fest@npm:0.20.2"
   checksum: 4fb3272df21ad1c552486f8a2f8e115c09a521ad7a8db3d56d53718d0c907b62c6e9141ba5f584af3f6830d0872c521357e512381f24f7c44acae583ad517d73
-  languageName: node
-  linkType: hard
-
-"type-fest@npm:^2.12.2":
-  version: 2.13.0
-  resolution: "type-fest@npm:2.13.0"
-  checksum: 3492384f759fdeaec7eaa07e79f70e777bf825cf8892690642fa9350818df4a8c50fd697fd1239ae7026064af4dd94e4d5eca27e781e0952ff302af0708a2e69
   languageName: node
   linkType: hard
 
