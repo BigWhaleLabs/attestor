@@ -19,6 +19,7 @@
     "@koa/cors": "^3.3.0",
     "amala": "^8.0.2",
     "circomlibjs": "^0.1.2",
+    "crypto-random-string": "^5.0.0",
     "dotenv": "^16.0.1",
     "envalid": "^7.3.1",
     "ethers": "^5.6.8",
