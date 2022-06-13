@@ -18,7 +18,7 @@ export default class VerifyController {
     const eddsa = await buildEddsa()
     const privateKey = utils.arrayify(env.EDDSA_PRIVATE_KEY)
     const publicKey = eddsa.prv2pub(privateKey)
-    return utils.hexlify(publicKey)
+    return utils.hexlify(publicKey[0])
   }
 
   @Get('/email')
