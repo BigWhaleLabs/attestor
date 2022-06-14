@@ -45,10 +45,14 @@ export default class VerifyController {
     // Verify ECDSA signature
     const ownerAddress = ethers.utils.verifyMessage(message, signature)
     // Verify ownership
-    const contract = ERC721__factory.connect(tokenAddress, provider)
-    const balance = await contract.balanceOf(ownerAddress)
-    if (balance.lte(0)) {
-      return ctx.throw(badRequest('Token not owned'))
+    try {
+      const contract = ERC721__factory.connect(tokenAddress, provider)
+      const balance = await contract.balanceOf(ownerAddress)
+      if (balance.lte(0)) {
+        return ctx.throw(badRequest('Token not owned'))
+      }
+    } catch {
+      return ctx.throw(badRequest("Can't verify token ownership"))
     }
     // Generate EDDSA signature
     const eddsaMessage = `${ownerAddress}-owns-${tokenAddress}`
