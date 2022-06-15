@@ -15,5 +15,8 @@ export default async function (message: string) {
   const privateKey = utils.arrayify(env.EDDSA_PRIVATE_KEY)
   const signature = eddsa.signMiMC(privateKey, M)
   const packedSignature = eddsa.packSignature(signature)
-  return utils.hexlify(packedSignature)
+  return {
+    signature: utils.hexlify(packedSignature),
+    message: `${message}-${nullifier}`,
+  }
 }

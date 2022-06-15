@@ -2,7 +2,7 @@ import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
 import { ERC721__factory } from '@big-whale-labs/seal-cred-ledger-contract'
 import { badRequest } from '@hapi/boom'
-import { buildEddsa } from 'circomlibjs'
+import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { ethers, utils } from 'ethers'
 import ERC721VerifyBody from '@/validators/ERC721VerifyBody'
 import EmailBody from '@/validators/EmailBody'
@@ -15,10 +15,15 @@ import sendEmail from '@/helpers/sendEmail'
 export default class VerifyController {
   @Get('/eddsa-public-key')
   async publicKey() {
+    const babyJub = await buildBabyjub()
+    const F = babyJub.F
     const eddsa = await buildEddsa()
     const privateKey = utils.arrayify(env.EDDSA_PRIVATE_KEY)
     const publicKey = eddsa.prv2pub(privateKey)
-    return utils.hexlify(publicKey[0])
+    return {
+      x: F.toObject(publicKey[0]).toString(),
+      y: F.toObject(publicKey[1]).toString(),
+    }
   }
 
   @Get('/email')
@@ -27,12 +32,12 @@ export default class VerifyController {
   }
 
   @Post('/email')
-  sendEmail(@Body({ required: true }) { email }: EmailBody) {
-    const signatureHexString = eddsaSigFromString(email)
+  async sendEmail(@Body({ required: true }) { email }: EmailBody) {
+    const { signature, message } = await eddsaSigFromString(email)
     return sendEmail(
       email,
       "Here's your token!",
-      `Your token is: ${signatureHexString}`
+      `Your token is: ${signature}-${message.slice(-6)}`
     )
   }
 
@@ -56,9 +61,6 @@ export default class VerifyController {
     }
     // Generate EDDSA signature
     const eddsaMessage = `${ownerAddress}-owns-${tokenAddress}`
-    return {
-      signature: await eddsaSigFromString(eddsaMessage),
-      message: eddsaMessage,
-    }
+    return eddsaSigFromString(eddsaMessage)
   }
 }
