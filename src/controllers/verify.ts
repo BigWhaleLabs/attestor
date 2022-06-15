@@ -60,7 +60,7 @@ export default class VerifyController {
       return ctx.throw(badRequest("Can't verify token ownership"))
     }
     // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress}-owns-${tokenAddress}`
+    const eddsaMessage = `${ownerAddress.toLowerCase()}-owns-${tokenAddress.toLowerCase()}`
     return eddsaSigFromString(eddsaMessage)
   }
 }
