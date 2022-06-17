@@ -21,10 +21,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@big-whale-labs/constants@npm:^0.0.14":
-  version: 0.0.14
-  resolution: "@big-whale-labs/constants@npm:0.0.14"
-  checksum: 99ca815f30d887896e4d2df6801c1877d12e7c13c4301ce206e64b9e0c9fa0ed3861bd872e445e394a5b389a9f689390099c0abf4c64a6e9ed28171b22cc4db3
+"@big-whale-labs/constants@npm:^0.0.18":
+  version: 0.0.18
+  resolution: "@big-whale-labs/constants@npm:0.0.18"
+  checksum: 07d24c651cdd2d02938d6c7dc090cae71c6fa57b4cfe588630d126faa844adbe2086fef42c92e41172d51b361df103322016739fed84ad0bed5febf751306fd1
   languageName: node
   linkType: hard
 
@@ -786,10 +786,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^17.0.42":
-  version: 17.0.42
-  resolution: "@types/node@npm:17.0.42"
-  checksum: a200cd87e4f12d4d5682a893ad6e1140720c6c074a2cd075f254b3b8306d6174f5a3630e5d2347efb5e9b80d420404b5fafc8fe3c7d4c81998cd914c50b19f75
+"@types/node@npm:^18.0.0":
+  version: 18.0.0
+  resolution: "@types/node@npm:18.0.0"
+  checksum: aab2b325727a2599f6d25ebe0dedf58c40fb66a51ce4ca9c0226ceb70fcda2d3afccdca29db5942eb48b158ee8585a274a1e3750c718bbd5399d7f41d62dfdcc
   languageName: node
   linkType: hard
 
@@ -1128,7 +1128,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "attestor@workspace:."
   dependencies:
-    "@big-whale-labs/constants": ^0.0.14
+    "@big-whale-labs/constants": ^0.0.18
     "@big-whale-labs/seal-cred-ledger-contract": ^0.0.5
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
@@ -1138,12 +1138,12 @@ __metadata:
     "@types/koa-bodyparser": ^4.3.7
     "@types/koa-router": ^7.4.4
     "@types/koa__cors": ^3.3.0
-    "@types/node": ^17.0.42
+    "@types/node": ^18.0.0
     "@types/nodemailer": ^6.4.4
     "@typescript-eslint/eslint-plugin": ^5.28.0
     "@typescript-eslint/parser": ^5.28.0
     amala: ^8.0.2
-    circomlibjs: ^0.1.2
+    circomlibjs: ^0.1.4
     dotenv: ^16.0.1
     entropy-string: ^4.2.0
     envalid: ^7.3.1
@@ -1160,7 +1160,7 @@ __metadata:
     koa-router: ^10.1.1
     module-alias: ^2.2.2
     nodemailer: ^6.7.5
-    prettier: ^2.7.0
+    prettier: ^2.7.1
     source-map-support: ^0.5.21
     tsc-watch: ^5.0.3
     typescript: ^4.7.3
@@ -1384,15 +1384,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"circomlibjs@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "circomlibjs@npm:0.1.2"
+"circomlibjs@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "circomlibjs@npm:0.1.4"
   dependencies:
     blake-hash: ^2.0.0
     blake2b: ^2.1.3
     ethers: ^5.5.1
     ffjavascript: ^0.2.45
-  checksum: 72d96fe6b15d49f2526d20dae7aa3de17a85467de83d8f7d0cda5ebfa32b5b03dacecf52fba2f08838efbe2fc3f2503db6fd336701d3d7a3ca41530816e91f4f
+  checksum: e3f30e87fc8ba602e37ad35f6c01a49b2a867749762bafd94516e786cf781f95a33f4865504c07968641d0275b599d2095dd1962c9f073593b750b7e6db412b7
   languageName: node
   linkType: hard
 
@@ -3664,12 +3664,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "prettier@npm:2.7.0"
+"prettier@npm:^2.7.1":
+  version: 2.7.1
+  resolution: "prettier@npm:2.7.1"
   bin:
     prettier: bin-prettier.js
-  checksum: 5b55bb1dced9d16635b83229df8e670d150890fdb343f19e8a66e610094a108e960c0f57352b3e5cdbc4eff4ef00a834406047ffcd9f20bd22a6497ba143c81f
+  checksum: 55a4409182260866ab31284d929b3cb961e5fdb91fe0d2e099dac92eaecec890f36e524b4c19e6ceae839c99c6d7195817579cdffc8e2c80da0cb794463a748b
   languageName: node
   linkType: hard
 
