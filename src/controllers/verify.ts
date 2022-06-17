@@ -11,19 +11,24 @@ import env from '@/helpers/env'
 import provider from '@/helpers/provider'
 import sendEmail from '@/helpers/sendEmail'
 
+let publicKeyCached: { x: string; y: string } | undefined
 @Controller('/verify')
 export default class VerifyController {
   @Get('/eddsa-public-key')
   async publicKey() {
+    if (publicKeyCached) {
+      return publicKeyCached
+    }
     const babyJub = await buildBabyjub()
     const F = babyJub.F
     const eddsa = await buildEddsa()
     const privateKey = utils.arrayify(env.EDDSA_PRIVATE_KEY)
     const publicKey = eddsa.prv2pub(privateKey)
-    return {
+    publicKeyCached = {
       x: F.toObject(publicKey[0]).toString(),
       y: F.toObject(publicKey[1]).toString(),
     }
+    return publicKeyCached
   }
 
   @Get('/email')
