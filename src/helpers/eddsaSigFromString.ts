@@ -3,10 +3,11 @@ import { buildEddsa, buildMimc7 } from 'circomlibjs'
 import { utils } from 'ethers'
 import env from '@/helpers/env'
 
+const entropy = new Entropy()
+
 export default async function (message: string) {
   // Message
-  const entropy = new Entropy()
-  const nullifier = entropy.string().substring(0, 6)
+  const nullifier = entropy.smallID()
   const messageUInt8 = utils.toUtf8Bytes(`${message}-${nullifier}`)
   const mimc7 = await buildMimc7()
   const M = mimc7.multiHash(messageUInt8)
