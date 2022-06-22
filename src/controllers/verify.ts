@@ -42,7 +42,7 @@ export default class VerifyController {
     return sendEmail(
       email,
       "Here's your token!",
-      `Your token is: ${signature}-${message.slice(-6)}`
+      `Your token is: ${signature}-${message.slice(-14)}`
     )
   }
 
