@@ -55,11 +55,7 @@ export default class VerifyController {
     ])
 
     const signature = await eddsaSigFromString(messageUInt8)
-    return sendEmail(
-      email,
-      "Here's your token!",
-      `Your token is: ${signature}-${nullifier}`
-    )
+    return sendEmail(email, "Here's your token!", `${signature}-${nullifier}`)
   }
 
   @Post('/erc721')
