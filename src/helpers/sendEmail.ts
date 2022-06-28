@@ -20,6 +20,6 @@ export default function (to: string, subject: string, token: string) {
     from: `"SealCred" <${user}>`,
     to,
     subject,
-    html: htmlBody.replace('${{token}}', token),
+    html: htmlBody.replace('{{token}}', token),
   })
 }
