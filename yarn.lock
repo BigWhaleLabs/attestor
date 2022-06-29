@@ -48,6 +48,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@big-whale-labs/constants@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@big-whale-labs/constants@npm:0.1.0"
+  checksum: fc17f0de1c7e003f9000df30a33eefea84f86c2f156d9a2f2435c86f8afadbc1ec40f90a2b42e7c98a1e123993edb56d074e6900e260d87131c6d449d8585c38
+  languageName: node
+  linkType: hard
+
 "@big-whale-labs/sc-email@npm:^0.0.2":
   version: 0.0.2
   resolution: "@big-whale-labs/sc-email@npm:0.0.2"
@@ -58,14 +65,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@big-whale-labs/seal-cred-ledger-contract@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@big-whale-labs/seal-cred-ledger-contract@npm:0.0.6"
+"@big-whale-labs/seal-cred-ledger-contract@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "@big-whale-labs/seal-cred-ledger-contract@npm:0.0.7"
   dependencies:
     "@big-whale-labs/constants": ^0.0.18
     entropy-string: ^4.2.0
     prompt-sync: ^4.2.0
-  checksum: a6eed7de1c84c102585be58051fa8d093544c1d37039baa1590eb3d59ba3c8bc79fd61a83a90da151f1239b735b7336720795c14679994918f253fb523b66e69
+  checksum: 4158b64075e6f0cc42cc0ce84d2dbe76fac3cd1c07d62f3556e9c640d2be36cc1d3a0e0b99f18bd961ec34c1191b99d495434c9d795d09531cc07d7a29b30d40
   languageName: node
   linkType: hard
 
@@ -1572,9 +1579,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "attestor@workspace:."
   dependencies:
-    "@big-whale-labs/constants": ^0.0.18
+    "@big-whale-labs/constants": ^0.1.0
     "@big-whale-labs/sc-email": ^0.0.2
-    "@big-whale-labs/seal-cred-ledger-contract": ^0.0.6
+    "@big-whale-labs/seal-cred-ledger-contract": ^0.0.7
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
     "@types/entropy-string": ^4.2.0
