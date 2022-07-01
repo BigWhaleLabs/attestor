@@ -77,8 +77,7 @@ export default class VerifyController {
       return ctx.throw(badRequest("Can't verify token ownership"))
     }
     // Generate EDDSA signature
-    const nullifier = entropy.string()
-    const eddsaMessage = `${ownerAddress.toLowerCase()}-owns-${tokenAddress.toLowerCase()}-${nullifier}`
+    const eddsaMessage = `${ownerAddress.toLowerCase()}-owns-${tokenAddress.toLowerCase()}`
     const eddsaSignature = await eddsaSigFromString(
       utils.toUtf8Bytes(eddsaMessage)
     )
