@@ -1,6 +1,6 @@
 import { createTransport } from 'nodemailer'
+import { generateTokenHtml } from '@big-whale-labs/seal-cred-email-template'
 import env from '@/helpers/env'
-import htmlBody from '@big-whale-labs/sc-email'
 
 const user = env.SMTP_USER
 const pass = env.SMTP_PASS
@@ -15,11 +15,12 @@ const emailer = createTransport({
   },
 })
 
-export default function (to: string, subject: string, token: string) {
+export default function (to: string, subject: string, secret: string) {
+  const { html } = generateTokenHtml({ secret })
   return emailer.sendMail({
     from: `"SealCred" <${user}>`,
     to,
     subject,
-    html: htmlBody.replace('{{token}}', token),
+    html,
   })
 }
