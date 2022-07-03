@@ -46,7 +46,7 @@ export default class VerifyController {
 
   @Post('/email')
   async sendEmail(@Body({ required: true }) { email }: EmailBody) {
-    const domain = email.split('@')[1]
+    const domain = email.split('@')[1].toLowerCase()
     const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
     const nullifier = entropy.string()
     const messageUInt8 = utils.concat([
