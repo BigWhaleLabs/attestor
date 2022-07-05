@@ -1,5 +1,5 @@
 import { createTransport } from 'nodemailer'
-import { generateTokenHtml } from '@big-whale-labs/seal-cred-email-template'
+import { generateTokenHtml } from '@big-whale-labs/seal-cred-email'
 import env from '@/helpers/env'
 
 const user = env.SMTP_USER
