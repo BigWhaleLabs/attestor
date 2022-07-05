@@ -14,4 +14,5 @@ export default cleanEnv(process.env, {
   EDDSA_PRIVATE_KEY: str(),
   ETH_NETWORK: str({ default: ETH_NETWORK }),
   ETH_RPC: str({ default: ETH_RPC }),
+  MAINNET_ETH_RPC: str(),
 })

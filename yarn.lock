@@ -1184,7 +1184,6 @@ __metadata:
     amala: ^8.0.2
     circomlibjs: ^0.1.6
     dotenv: ^16.0.1
-    entropy-string: ^4.2.0
     envalid: ^7.3.1
     eslint: ^8.19.0
     eslint-config-prettier: ^8.5.0
