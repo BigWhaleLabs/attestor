@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@big-whale-labs/constants": "^0.1.0",
-    "@big-whale-labs/sc-email": "^0.0.2",
+    "@big-whale-labs/seal-cred-email": "^0.1.4",
     "@big-whale-labs/seal-cred-ledger-contract": "^0.0.7",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^3.3.0",
