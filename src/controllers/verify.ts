@@ -22,6 +22,11 @@ function padZeroesOnRightUint8(array: Uint8Array, length: number) {
   return utils.concat([array, padding])
 }
 
+function padZeroesOnLeftHexString(hexString: string, length: number) {
+  const padding = '0'.repeat(length - hexString.length)
+  return `0x${padding}${hexString.substring(2)}`
+}
+
 let publicKeyCached: { x: string; y: string } | undefined
 @Controller('/verify')
 export default class VerifyController {
@@ -144,7 +149,10 @@ export default class VerifyController {
     // Verify ownership
     const balance = await provider.getBalance(ownerAddress)
     // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}${balance.toHexString()}`
+    const eddsaMessage = `${ownerAddress.toLowerCase()}${network.substring(
+      0,
+      1
+    )}${padZeroesOnLeftHexString(balance.toHexString(), 66)}`
     const eddsaSignature = await eddsaSigFromString(
       utils.toUtf8Bytes(eddsaMessage)
     )
@@ -177,7 +185,10 @@ export default class VerifyController {
       return ctx.throw(badRequest("Can't verify token ownership"))
     }
     // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${balance.toHexString()}`
+    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network.substring(
+      0,
+      1
+    )}${padZeroesOnLeftHexString(balance.toHexString(), 66)}`
     const eddsaSignature = await eddsaSigFromString(
       utils.toUtf8Bytes(eddsaMessage)
     )
