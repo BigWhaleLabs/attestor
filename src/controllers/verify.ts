@@ -6,6 +6,7 @@ import { Entropy } from 'entropy-string'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { goerliProvider, mainnetProvider } from '@/helpers/providers'
+import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import Network from '@/models/Network'
@@ -142,6 +143,24 @@ export default class VerifyController {
       0,
       1
     )}${padZeroesOnLeftHexString(balance.toHexString(), 66)}`
+    const eddsaSignature = await eddsaSigFromString(
+      utils.toUtf8Bytes(eddsaMessage)
+    )
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
+  @Post('/ethereum-address')
+  async ethereumAddress(
+    @Body({ required: true })
+    { signature, message }: AddressVerifyBody
+  ) {
+    // Verify ECDSA signature
+    const ownerAddress = ethers.utils.verifyMessage(message, signature)
+    // Generate EDDSA signature
+    const eddsaMessage = ownerAddress.toLowerCase()
     const eddsaSignature = await eddsaSigFromString(
       utils.toUtf8Bytes(eddsaMessage)
     )
