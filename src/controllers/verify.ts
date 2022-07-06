@@ -9,13 +9,13 @@ import { goerliProvider, mainnetProvider } from '@/helpers/providers'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import Network from '@/models/Network'
-import OldTokenVerifyBody from '@/validators/OldTokenVerifyBody'
 import TokenVerifyBody from '@/validators/TokenVerifyBody'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 import sendEmail from '@/helpers/sendEmail'
 
 const entropy = new Entropy({ total: 1e6, risk: 1e9 })
+const zeroAddress = '0x0000000000000000000000000000000000000000'
 
 function padZeroesOnRightUint8(array: Uint8Array, length: number) {
   const padding = new Uint8Array(length - array.length)
@@ -76,42 +76,10 @@ export default class VerifyController {
   }
 
   @Post('/erc721')
-  @Version('0.2.1')
-  async erc721V021(
-    @Ctx() ctx: Context,
-    @Body({ required: true })
-    { tokenAddress, signature, message, network }: TokenVerifyBody
-  ) {
-    const provider =
-      network === Network.goerli ? goerliProvider : mainnetProvider
-    // Verify ECDSA signature
-    const ownerAddress = ethers.utils.verifyMessage(message, signature)
-    // Verify ownership
-    try {
-      const contract = ERC721__factory.connect(tokenAddress, provider)
-      const balance = await contract.balanceOf(ownerAddress)
-      if (balance.lte(0)) {
-        return ctx.throw(badRequest('Token not owned'))
-      }
-    } catch {
-      return ctx.throw(badRequest("Can't verify token ownership"))
-    }
-    // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}`
-    const eddsaSignature = await eddsaSigFromString(
-      utils.toUtf8Bytes(eddsaMessage)
-    )
-    return {
-      signature: eddsaSignature,
-      message: eddsaMessage,
-    }
-  }
-
-  @Post('/erc721')
   async erc721(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress, signature, message }: OldTokenVerifyBody
+    { tokenAddress, signature, message }: TokenVerifyBody
   ) {
     // Verify ECDSA signature
     const ownerAddress = ethers.utils.verifyMessage(message, signature)
@@ -137,36 +105,16 @@ export default class VerifyController {
     }
   }
 
-  @Post('/ethereum-balance')
-  async ethereumBalance(
-    @Body({ required: true })
-    { signature, message, network }: BalanceVerifyBody
-  ) {
-    const provider =
-      network === Network.goerli ? goerliProvider : mainnetProvider
-    // Verify ECDSA signature
-    const ownerAddress = ethers.utils.verifyMessage(message, signature)
-    // Verify ownership
-    const balance = await provider.getBalance(ownerAddress)
-    // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}${network.substring(
-      0,
-      1
-    )}${padZeroesOnLeftHexString(balance.toHexString(), 66)}`
-    const eddsaSignature = await eddsaSigFromString(
-      utils.toUtf8Bytes(eddsaMessage)
-    )
-    return {
-      signature: eddsaSignature,
-      message: eddsaMessage,
-    }
-  }
-
-  @Post('/erc20-balance')
-  async erc20Balance(
+  @Post('/balance')
+  async balance(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress, signature, message, network }: TokenVerifyBody
+    {
+      tokenAddress = zeroAddress,
+      signature,
+      message,
+      network,
+    }: BalanceVerifyBody
   ) {
     const provider =
       network === Network.goerli ? goerliProvider : mainnetProvider
@@ -175,14 +123,19 @@ export default class VerifyController {
     // Verify ownership
     let balance: BigNumber
     try {
-      const abi = [
-        // Read-Only Functions
-        'function balanceOf(address owner) view returns (uint256)',
-      ]
-      const contract = new ethers.Contract(tokenAddress, abi, provider)
-      balance = await contract.balanceOf(ownerAddress)
+      // Check if it's ethereum balance
+      if (tokenAddress === zeroAddress) {
+        balance = await provider.getBalance(ownerAddress)
+      } else {
+        const abi = [
+          // Read-Only Functions
+          'function balanceOf(address owner) view returns (uint256)',
+        ]
+        const contract = new ethers.Contract(tokenAddress, abi, provider)
+        balance = await contract.balanceOf(ownerAddress)
+      }
     } catch {
-      return ctx.throw(badRequest("Can't verify token ownership"))
+      return ctx.throw(badRequest("Can't fetch the balance"))
     }
     // Generate EDDSA signature
     const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network.substring(
