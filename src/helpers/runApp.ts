@@ -16,7 +16,7 @@ export default async function () {
     router,
     basePath: '/',
     controllers: [resolve(__dirname, '../controllers/*')],
-    disableVersioning: true,
+    versions: ['0.2', '0.2.1'],
   })
   app.use(cors({ origin: '*' }))
   app.use(bodyParser())
