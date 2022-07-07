@@ -110,17 +110,10 @@ export default class VerifyController {
   async balance(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    {
-      tokenAddress = zeroAddress,
-      signature,
-      message,
-      network,
-    }: BalanceVerifyBody
+    { tokenAddress = zeroAddress, network, ownerAddress }: BalanceVerifyBody
   ) {
     const provider =
       network === Network.goerli ? goerliProvider : mainnetProvider
-    // Verify ECDSA signature
-    const ownerAddress = ethers.utils.verifyMessage(message, signature)
     // Verify ownership
     let balance: BigNumber
     try {
