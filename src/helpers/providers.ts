@@ -5,4 +5,7 @@ export const goerliProvider = new providers.JsonRpcProvider(
   env.ETH_RPC,
   env.ETH_NETWORK
 )
-export const mainnetProvider = new providers.CloudflareProvider()
+export const mainnetProvider = new providers.JsonRpcProvider(
+  env.ETH_RPC_MAINNET,
+  'mainnet'
+)

@@ -13,13 +13,15 @@ And you should be good to go! Feel free to fork and submit pull requests.
 
 ## Environment variables
 
-| Name                | Description                                        |
-| ------------------- | -------------------------------------------------- |
-| `PORT`              | Port to run server on (defaults to 1337)           |
-| `SMTP_USER`         | SMTP username for email verification               |
-| `SMTP_PASS`         | SMTP password for email verification               |
-| `EDDSA_PRIVATE_KEY` | EdDSA private key for signing the attestations     |
-| `ETH_NETWORK`       | Ethereum network (defaults to @bwl/constants)      |
-| `ETH_RPC`           | Ethereum node RPC URI (defaults to @bwl/constants) |
+| Name                | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| `PORT`              | Port to run server on (defaults to 1337)                   |
+| `SMTP_USER`         | SMTP username for email verification                       |
+| `SMTP_PASS`         | SMTP password for email verification                       |
+| `EDDSA_PRIVATE_KEY` | EdDSA private key for signing the attestations             |
+| `ECDSA_PRIVATE_KEY` | ECDSA private key for signing the attestations             |
+| `ETH_NETWORK`       | Ethereum network (defaults to @bwl/constants)              |
+| `ETH_RPC`           | Ethereum node RPC URI (defaults to @bwl/constants)         |
+| `ETH_RPC_MAINNET`   | Ethereum mainnet node RPC URI (defaults to @bwl/constants) |
 
 Also, please, consider looking at `.env.sample`.
