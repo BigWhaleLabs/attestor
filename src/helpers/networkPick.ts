@@ -6,9 +6,9 @@ export default function <T>(
   mainnetOption: T
 ) {
   switch (attestationSource) {
-    case Network.goerli:
+    case Network.Goerli:
       return goerliOption
-    case Network.mainnet:
+    case Network.Mainnet:
       return mainnetOption
   }
 }

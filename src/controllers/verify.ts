@@ -138,10 +138,9 @@ export default class VerifyController {
       return ctx.throw(badRequest("Can't fetch the balance"))
     }
     // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network.substring(
-      0,
-      1
-    )}`
+    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network
+      .toLowerCase()
+      .substring(0, 1)}`
     const eddsaSignature = await eddsaSigFromString(
       ethers.utils.concat([
         utils.toUtf8Bytes(eddsaMessage),
