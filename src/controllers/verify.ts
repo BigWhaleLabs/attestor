@@ -141,15 +141,14 @@ export default class VerifyController {
     const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network
       .toLowerCase()
       .substring(0, 1)}`
-    const eddsaSignature = await eddsaSigFromString(
-      ethers.utils.concat([
-        utils.toUtf8Bytes(eddsaMessage),
-        utils.arrayify(balance),
-      ])
-    )
+    const eddsaSignature = await eddsaSigFromString([
+      ...utils.toUtf8Bytes(eddsaMessage),
+      balance,
+    ])
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
+      balance: balance.toHexString(),
     }
   }
 
