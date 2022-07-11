@@ -207,6 +207,9 @@ export default class VerifyController {
         )
       }
     }
+    if (!name || !symbol) {
+      return ctx.throw(badRequest('Name or symbol not found'))
+    }
     const message = [
       ...ethers.utils.toUtf8Bytes(tokenAddress.toLowerCase()),
       networkPick(network, 103, 109), // 103 = 'g', 109 = 'm',
