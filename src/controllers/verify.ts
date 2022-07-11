@@ -15,6 +15,7 @@ import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 import networkPick from '@/helpers/networkPick'
+import reservedContractMetadata from '@/helpers/reservedContractMetadata'
 import sendEmail from '@/helpers/sendEmail'
 
 const entropy = new Entropy({ total: 1e6, risk: 1e9 })
@@ -179,26 +180,32 @@ export default class VerifyController {
     // Get metadata
     let name: string
     let symbol: string
-    try {
-      const abi = [
-        'function name() external view returns (string memory)',
-        'function symbol() external view returns (string memory)',
-      ]
-      const contract = new ethers.Contract(
-        tokenAddress,
-        abi,
-        networkPick(network, goerliProvider, mainnetProvider)
-      )
-      name = await contract.name()
-      symbol = await contract.symbol()
-    } catch (error) {
-      return ctx.throw(
-        badRequest(
-          `Can't fetch the metadata: ${
-            error instanceof Error ? error.message : error
-          }`
+    const contractMetadata = reservedContractMetadata[tokenAddress]
+    if (reservedContractMetadata) {
+      name = contractMetadata.name
+      symbol = contractMetadata.symbol
+    } else {
+      try {
+        const abi = [
+          'function name() external view returns (string memory)',
+          'function symbol() external view returns (string memory)',
+        ]
+        const contract = new ethers.Contract(
+          tokenAddress,
+          abi,
+          networkPick(network, goerliProvider, mainnetProvider)
         )
-      )
+        name = await contract.name()
+        symbol = await contract.symbol()
+      } catch (error) {
+        return ctx.throw(
+          badRequest(
+            `Can't fetch the metadata: ${
+              error instanceof Error ? error.message : error
+            }`
+          )
+        )
+      }
     }
     const message = [
       ...ethers.utils.toUtf8Bytes(tokenAddress.toLowerCase()),
