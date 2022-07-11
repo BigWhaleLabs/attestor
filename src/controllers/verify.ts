@@ -181,8 +181,8 @@ export default class VerifyController {
     let symbol: string
     try {
       const abi = [
-        'function name() external view returns (string _name)',
-        'function symbol() external view returns (string _symbol);',
+        'function name() external view returns (string memory)',
+        'function symbol() external view returns (string memory)',
       ]
       const contract = new ethers.Contract(
         tokenAddress,
@@ -191,8 +191,14 @@ export default class VerifyController {
       )
       name = await contract.name()
       symbol = await contract.symbol()
-    } catch {
-      return ctx.throw(badRequest("Can't fetch the metadata"))
+    } catch (error) {
+      return ctx.throw(
+        badRequest(
+          `Can't fetch the metadata: ${
+            error instanceof Error ? error.message : error
+          }`
+        )
+      )
     }
     const message = [
       ...ethers.utils.toUtf8Bytes(tokenAddress.toLowerCase()),
