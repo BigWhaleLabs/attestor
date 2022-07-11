@@ -181,7 +181,7 @@ export default class VerifyController {
     let name: string
     let symbol: string
     const contractMetadata = reservedContractMetadata[tokenAddress]
-    if (reservedContractMetadata) {
+    if (contractMetadata) {
       name = contractMetadata.name
       symbol = contractMetadata.symbol
     } else {
