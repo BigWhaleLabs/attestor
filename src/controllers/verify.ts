@@ -48,7 +48,7 @@ export default class VerifyController {
     return publicKeyCached
   }
 
-  @Get('ecdsa-address')
+  @Get('/ecdsa-address')
   ecdsaAddress() {
     if (ecdsaAddress) {
       return ecdsaAddress
