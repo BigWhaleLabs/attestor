@@ -1,6 +1,6 @@
 enum Network {
-  'mainnet' = 'mainnet',
-  'goerli' = 'goerli',
+  Mainnet = 'Mainnet',
+  Goerli = 'Goerli',
 }
 
 export default Network

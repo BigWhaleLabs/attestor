@@ -6,13 +6,16 @@ import { Entropy } from 'entropy-string'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { goerliProvider, mainnetProvider } from '@/helpers/providers'
+import { reservedContractMetadata } from '@big-whale-labs/constants'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
-import Network from '@/models/Network'
+import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import TokenVerifyBody from '@/validators/TokenVerifyBody'
+import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
+import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
 
 const entropy = new Entropy({ total: 1e6, risk: 1e9 })
@@ -23,12 +26,9 @@ function padZeroesOnRightUint8(array: Uint8Array, length: number) {
   return utils.concat([array, padding])
 }
 
-function padZeroesOnLeftHexString(hexString: string, length: number) {
-  const padding = '0'.repeat(length - hexString.length)
-  return `0x${padding}${hexString.substring(2)}`
-}
-
 let publicKeyCached: { x: string; y: string } | undefined
+let ecdsaAddress: string | undefined
+
 @Controller('/verify')
 export default class VerifyController {
   @Get('/eddsa-public-key')
@@ -46,6 +46,17 @@ export default class VerifyController {
       y: F.toObject(publicKey[1]).toString(),
     }
     return publicKeyCached
+  }
+
+  @Get('/ecdsa-address')
+  ecdsaAddress() {
+    if (ecdsaAddress) {
+      return ecdsaAddress
+    }
+    const ecdsaWallet = new ethers.Wallet(env.ECDSA_PRIVATE_KEY)
+    const address = ecdsaWallet.address
+    ecdsaAddress = address.toLowerCase()
+    return ecdsaAddress
   }
 
   @Get('/email')
@@ -112,8 +123,7 @@ export default class VerifyController {
     @Body({ required: true })
     { tokenAddress = zeroAddress, network, ownerAddress }: BalanceVerifyBody
   ) {
-    const provider =
-      network === Network.goerli ? goerliProvider : mainnetProvider
+    const provider = networkPick(network, goerliProvider, mainnetProvider)
     // Verify ownership
     let balance: BigNumber
     try {
@@ -121,10 +131,7 @@ export default class VerifyController {
       if (tokenAddress === zeroAddress) {
         balance = await provider.getBalance(ownerAddress)
       } else {
-        const abi = [
-          // Read-Only Functions
-          'function balanceOf(address owner) view returns (uint256)',
-        ]
+        const abi = ['function balanceOf(address owner) view returns (uint256)']
         const contract = new ethers.Contract(tokenAddress, abi, provider)
         balance = await contract.balanceOf(ownerAddress)
       }
@@ -132,16 +139,17 @@ export default class VerifyController {
       return ctx.throw(badRequest("Can't fetch the balance"))
     }
     // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network.substring(
-      0,
-      1
-    )}${padZeroesOnLeftHexString(balance.toHexString(), 66)}`
-    const eddsaSignature = await eddsaSigFromString(
-      utils.toUtf8Bytes(eddsaMessage)
-    )
+    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network
+      .toLowerCase()
+      .substring(0, 1)}`
+    const eddsaSignature = await eddsaSigFromString([
+      ...utils.toUtf8Bytes(eddsaMessage),
+      balance,
+    ])
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
+      balance: balance.toHexString(),
     }
   }
 
@@ -160,6 +168,59 @@ export default class VerifyController {
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
+    }
+  }
+
+  @Post('/contract-metadata')
+  async contractMetadata(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { tokenAddress, network }: MetadataVerifyBody
+  ) {
+    // Get metadata
+    let name: string
+    let symbol: string
+    const contractMetadata = reservedContractMetadata[tokenAddress]
+    if (contractMetadata) {
+      name = contractMetadata.name
+      symbol = contractMetadata.symbol
+    } else {
+      try {
+        const abi = [
+          'function name() external view returns (string memory)',
+          'function symbol() external view returns (string memory)',
+        ]
+        const contract = new ethers.Contract(
+          tokenAddress,
+          abi,
+          networkPick(network, goerliProvider, mainnetProvider)
+        )
+        name = await contract.name()
+        symbol = await contract.symbol()
+      } catch (error) {
+        return ctx.throw(
+          badRequest(
+            `Can't fetch the metadata: ${
+              error instanceof Error ? error.message : error
+            }`
+          )
+        )
+      }
+    }
+    if (!name || !symbol) {
+      return ctx.throw(badRequest('Name or symbol not found'))
+    }
+    const message = [
+      ...ethers.utils.toUtf8Bytes(tokenAddress.toLowerCase()),
+      networkPick(network, 103, 109), // 103 = 'g', 109 = 'm',
+      ...ethers.utils.toUtf8Bytes(name),
+      0,
+      ...ethers.utils.toUtf8Bytes(symbol),
+    ]
+    const signature = await ecdsaSigFromString(new Uint8Array(message))
+    return {
+      signature,
+      message: utils.hexlify(message),
     }
   }
 }
