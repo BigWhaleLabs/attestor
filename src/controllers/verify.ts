@@ -61,7 +61,7 @@ export default class VerifyController {
   }
 
   @Post('/email')
-  async sendEmailV021(@Body({ required: true }) { email }: EmailVerifyBody) {
+  async sendEmail(@Body({ required: true }) { email }: EmailVerifyBody) {
     const domain = email.split('@')[1].toLowerCase()
     const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
     const signature = await eddsaSigFromString(domainBytes)
