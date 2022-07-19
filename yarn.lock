@@ -656,15 +656,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/entropy-string@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "@types/entropy-string@npm:4.2.0"
-  dependencies:
-    "@types/node": "*"
-  checksum: 70e03d51ad5af4542dd9e3e1ca6dac99e18659cb8586430e40120047ac62d082608b7295907bc8310eea85409535a2a1495baef155f06c88b6e43c783763efc6
-  languageName: node
-  linkType: hard
-
 "@types/express-serve-static-core@npm:^4.17.18":
   version: 4.17.29
   resolution: "@types/express-serve-static-core@npm:4.17.29"
@@ -1186,7 +1177,6 @@ __metadata:
     "@big-whale-labs/seal-cred-ledger-contract": ^0.2.3
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
-    "@types/entropy-string": ^4.2.0
     "@types/imapflow": ^1.0.9
     "@types/koa": ^2.13.4
     "@types/koa-bodyparser": ^4.3.7
@@ -1199,7 +1189,6 @@ __metadata:
     amala: ^8.0.2
     circomlibjs: ^0.1.6
     dotenv: ^16.0.1
-    entropy-string: ^4.2.0
     envalid: ^7.3.1
     eslint: ^8.19.0
     eslint-config-prettier: ^8.5.0

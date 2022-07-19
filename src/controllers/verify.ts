@@ -1,8 +1,6 @@
 import { BigNumber, ethers, utils } from 'ethers'
-import { Body, Controller, Ctx, Get, Post, Version } from 'amala'
+import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
-import { ERC721__factory } from '@big-whale-labs/seal-cred-ledger-contract'
-import { Entropy } from 'entropy-string'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { goerliProvider, mainnetProvider } from '@/helpers/providers'
@@ -11,14 +9,12 @@ import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
-import TokenVerifyBody from '@/validators/TokenVerifyBody'
 import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
 import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
 
-const entropy = new Entropy({ total: 1e6, risk: 1e9 })
 const zeroAddress = '0x0000000000000000000000000000000000000000'
 
 function padZeroesOnRightUint8(array: Uint8Array, length: number) {
@@ -65,56 +61,11 @@ export default class VerifyController {
   }
 
   @Post('/email')
-  @Version('0.2.1')
   async sendEmailV021(@Body({ required: true }) { email }: EmailVerifyBody) {
     const domain = email.split('@')[1].toLowerCase()
     const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
     const signature = await eddsaSigFromString(domainBytes)
     return sendEmail(email, "Here's your token!", signature)
-  }
-
-  @Post('/email')
-  async sendEmail(@Body({ required: true }) { email }: EmailVerifyBody) {
-    const domain = email.split('@')[1].toLowerCase()
-    const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
-    const nullifier = entropy.string()
-    const messageUInt8 = utils.concat([
-      domainBytes,
-      utils.toUtf8Bytes(nullifier),
-    ])
-
-    const signature = await eddsaSigFromString(messageUInt8)
-    return sendEmail(email, "Here's your token!", `${signature}-${nullifier}`)
-  }
-
-  @Post('/erc721')
-  async erc721(
-    @Ctx() ctx: Context,
-    @Body({ required: true })
-    { tokenAddress, signature, message }: TokenVerifyBody
-  ) {
-    // Verify ECDSA signature
-    const ownerAddress = ethers.utils.verifyMessage(message, signature)
-    // Verify ownership
-    try {
-      const contract = ERC721__factory.connect(tokenAddress, goerliProvider)
-      const balance = await contract.balanceOf(ownerAddress)
-      if (balance.lte(0)) {
-        return ctx.throw(badRequest('Token not owned'))
-      }
-    } catch {
-      return ctx.throw(badRequest("Can't verify token ownership"))
-    }
-    // Generate EDDSA signature
-    const nullifier = entropy.string()
-    const eddsaMessage = `${ownerAddress.toLowerCase()}-owns-${tokenAddress.toLowerCase()}-${nullifier}`
-    const eddsaSignature = await eddsaSigFromString(
-      utils.toUtf8Bytes(eddsaMessage)
-    )
-    return {
-      signature: eddsaSignature,
-      message: eddsaMessage,
-    }
   }
 
   @Post('/balance')
