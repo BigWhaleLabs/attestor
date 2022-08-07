@@ -1,10 +1,10 @@
 import { BigNumber, ethers, utils } from 'ethers'
 import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
+import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { goerliProvider, mainnetProvider } from '@/helpers/providers'
-import { reservedContractMetadata } from '@big-whale-labs/constants'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
@@ -131,7 +131,7 @@ export default class VerifyController {
     // Get metadata
     let name: string
     let symbol: string
-    const contractMetadata = reservedContractMetadata[tokenAddress]
+    const contractMetadata = RESERVED_CONTRACT_METADATA[tokenAddress]
     if (contractMetadata) {
       name = contractMetadata.name
       symbol = contractMetadata.symbol
