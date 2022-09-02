@@ -65,7 +65,7 @@ export default class VerifyController {
     const domain = email.split('@')[1].toLowerCase()
     const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
     const signature = await eddsaSigFromString(domainBytes)
-    return sendEmail(email, "Here's your token!", signature)
+    return sendEmail(email, "Here's your token!", signature, domain)
   }
 
   @Post('/balance')
