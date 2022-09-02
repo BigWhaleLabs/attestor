@@ -15,12 +15,17 @@ const emailer = createTransport({
   },
 })
 
-export default function (
-  to: string,
-  subject: string,
-  secret: string,
+export default function ({
+  to,
+  subject,
+  secret,
+  domain,
+}: {
+  to: string
+  subject: string
+  secret: string
   domain: string
-) {
+}) {
   const { html } = generateTokenHtml({ secret, domain })
   return emailer.sendMail({
     from: `"SealCred" <${user}>`,
