@@ -21,16 +21,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@big-whale-labs/seal-cred-email@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@big-whale-labs/seal-cred-email@npm:1.1.0"
+"@big-whale-labs/seal-cred-email@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@big-whale-labs/seal-cred-email@npm:1.1.1"
   dependencies:
     envalid: ^7.3.1
     mjml: ^4.3.1
     mjml-react: ^1.0.45
     react: ^16.7.0
     react-dom: ^16.7.0
-  checksum: 20d7bf5b1f31b55975acd5cd7e883ad7fc54c19bee504ff4e66e353987ec46fa18c98e404193d74ea8261943c252d0fdef20a270581d4ad9c76201212c726259
+  checksum: 5af8c17b704b7bcfd0081f4ad9e3223ad5ad2650b4a1f0a13d6d3585825a5b1a559efb7c2bf31ee373fe14b3473636aa3e097dded0cba6eaaaf7fb652aa53a1e
   languageName: node
   linkType: hard
 
@@ -1166,7 +1166,7 @@ __metadata:
   resolution: "attestor@workspace:."
   dependencies:
     "@big-whale-labs/constants": ^0.1.17
-    "@big-whale-labs/seal-cred-email": ^1.1.0
+    "@big-whale-labs/seal-cred-email": ^1.1.1
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^3.3.0
     "@types/imapflow": ^1.0.9
