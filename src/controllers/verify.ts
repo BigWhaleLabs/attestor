@@ -4,12 +4,17 @@ import { Context } from 'koa'
 import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
-import { goerliProvider, mainnetProvider } from '@/helpers/providers'
+import {
+  goerliProvider,
+  mainnetProvider,
+  rinkebyProvider,
+} from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
+import axios from 'axios'
 import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
 import env from '@/helpers/env'
@@ -116,6 +121,24 @@ export default class VerifyController {
     @Body({ required: true })
     { username, address }: FarcasterVerifyBody
   ) {
+    const abi = ['function usernameToUrl(bytes32 name) view returns (string)']
+    const contract = new ethers.Contract(
+      '0xe3Be01D99bAa8dB9905b33a3cA391238234B79D1',
+      abi,
+      rinkebyProvider
+    )
+    const url = (await contract.usernameToUrl(username)).replace(
+      'directory',
+      'proof'
+    )
+    const {
+      data: { signerAddress },
+    } = await axios.get<{
+      signerAddress: string
+    }>(url)
+    if (signerAddress?.toLowerCase() !== address.toLowerCase()) {
+      return ctx.throw(badRequest("Connected address doesn't match"))
+    }
     // Generate EDDSA signature
     const eddsaMessage = `${address.toLowerCase()}ownsfarcaster`
     const eddsaSignature = await eddsaSigFromString([
