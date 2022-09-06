@@ -8,6 +8,7 @@ import { goerliProvider, mainnetProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
+import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/eddsaSigFromString'
@@ -106,6 +107,23 @@ export default class VerifyController {
       signature: eddsaSignature,
       message: eddsaMessage,
       balance: balance.toHexString(),
+    }
+  }
+
+  @Post('/farcaster')
+  async farcaster(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { username, address }: FarcasterVerifyBody
+  ) {
+    // Generate EDDSA signature
+    const eddsaMessage = `${address.toLowerCase()}ownsfarcaster`
+    const eddsaSignature = await eddsaSigFromString([
+      ...utils.toUtf8Bytes(eddsaMessage),
+    ])
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
     }
   }
 
