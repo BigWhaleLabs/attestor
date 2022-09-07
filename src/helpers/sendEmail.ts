@@ -15,7 +15,7 @@ const emailer = createTransport({
   },
 })
 
-export default function ({
+export default async function ({
   to,
   subject,
   secret,
@@ -26,11 +26,15 @@ export default function ({
   secret: string
   domain: string
 }) {
-  const { html } = generateTokenHtml({ secret, domain })
-  return emailer.sendMail({
-    from: `"SealCred" <${user}>`,
-    to,
-    subject,
-    html,
-  })
+  try {
+    const { html } = generateTokenHtml({ secret, domain })
+    await emailer.sendMail({
+      from: `"SealCred" <${user}>`,
+      to,
+      subject,
+      html,
+    })
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+  }
 }
