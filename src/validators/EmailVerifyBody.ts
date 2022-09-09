@@ -1,6 +1,6 @@
 import { IsEmail } from 'amala'
 
 export default class {
-  @IsEmail({ each: true })
+  @IsEmail({}, { each: true })
   emails!: string[]
 }
