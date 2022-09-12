@@ -4,6 +4,7 @@ import { Context } from 'koa'
 import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
+import { formatBytes32String } from 'ethers/lib/utils'
 import {
   goerliProvider,
   mainnetProvider,
@@ -129,7 +130,8 @@ export default class VerifyController {
       abi,
       rinkebyProvider
     )
-    const url = (await contract.usernameToUrl(username)).replace(
+    const formatedUsername = formatBytes32String(username)
+    const url = (await contract.usernameToUrl(formatedUsername)).replace(
       'directory',
       'proof'
     )
