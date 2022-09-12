@@ -132,20 +132,17 @@ export default class VerifyController {
     )
     const formatedUsername = formatBytes32String(username)
     const url = await contract.usernameToUrl(formatedUsername)
-    if (!url) {
-      return ctx.throw(badRequest(`Can't find user`))
-    }
+    if (!url) return ctx.throw(badRequest(`Can't find user`))
     const infoUrl = url.replace('directory', 'proof')
     const {
       data: { signerAddress },
     } = await axios.get<{
       signerAddress: string
     }>(infoUrl)
-    if (signerAddress?.toLowerCase() !== address.toLowerCase()) {
+    if (signerAddress?.toLowerCase() !== address.toLowerCase())
       return ctx.throw(
         badRequest(`Couldn't find a user with this username ${username}`)
       )
-    }
     // Generate EDDSA signature
     const eddsaMessage = `${address.toLowerCase()}ownsfarcaster`
     const eddsaSignature = await eddsaSigFromString([
