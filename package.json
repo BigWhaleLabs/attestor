@@ -13,7 +13,7 @@
     "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@big-whale-labs/constants": "^0.1.28",
+    "@big-whale-labs/constants": "^0.1.29",
     "@big-whale-labs/seal-cred-email": "^1.1.1",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^3.4.1",
@@ -31,14 +31,14 @@
   "devDependencies": {
     "@types/imapflow": "^1.0.10",
     "@types/koa": "^2.13.5",
-    "@types/koa-bodyparser": "^4.3.7",
+    "@types/koa-bodyparser": "^4.3.8",
     "@types/koa-router": "^7.4.4",
     "@types/koa__cors": "^3.3.0",
-    "@types/node": "^18.7.15",
-    "@types/nodemailer": "^6.4.5",
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
-    "eslint": "^8.23.0",
+    "@types/node": "^18.7.17",
+    "@types/nodemailer": "^6.4.6",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-no-relative-import-paths": "^1.4.0",
@@ -49,10 +49,10 @@
     "prettier": "^2.7.1",
     "source-map-support": "^0.5.21",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.3"
   },
   "_moduleAliases": {
     "@": "dist"
   },
-  "packageManager": "yarn@3.1.0"
+  "packageManager": "yarn@3.2.3"
 }
