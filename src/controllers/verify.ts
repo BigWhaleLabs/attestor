@@ -1,9 +1,10 @@
 import { BigNumber, ethers, utils } from 'ethers'
 import { Body, Controller, Ctx, Get, Post } from 'amala'
 import { Context } from 'koa'
+import { MerkleTree } from 'merkletreejs'
 import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
-import { buildBabyjub, buildEddsa } from 'circomlibjs'
+import { buildBabyjub, buildEddsa, buildMimc7 } from 'circomlibjs'
 import { formatBytes32String } from 'ethers/lib/utils'
 import {
   goerliProvider,
@@ -86,36 +87,48 @@ export default class VerifyController {
   async balance(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress = zeroAddress, network, ownerAddress }: BalanceVerifyBody
+    { network, owners }: BalanceVerifyBody
   ) {
     const provider = networkPick(network, goerliProvider, mainnetProvider)
     // Verify ownership
     let balance: BigNumber
-    try {
-      // Check if it's ethereum balance
-      if (tokenAddress === zeroAddress) {
-        balance = await provider.getBalance(ownerAddress)
-      } else {
-        const abi = ['function balanceOf(address owner) view returns (uint256)']
-        const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(ownerAddress)
+    const mimc7 = await buildMimc7()
+    const merkleTree: MerkleTree = new MerkleTree([], mimc7.multiHash)
+    const abi = ['function balanceOf(address owner) view returns (uint256)']
+
+    for (const owner of owners) {
+      try {
+        // Check if it's ethereum balance
+        if (owner.tokenAddress === zeroAddress) {
+          balance = await provider.getBalance(owner.address)
+        } else {
+          const contract = new ethers.Contract(
+            owner.tokenAddress,
+            abi,
+            provider
+          )
+          balance = await contract.balanceOf(owner.address)
+          // TODO
+          if (!balance.gte(BigNumber.from(owner.threshold))) return
+        }
+      } catch {
+        return ctx.throw(badRequest("Can't fetch the balance"))
       }
-    } catch {
-      return ctx.throw(badRequest("Can't fetch the balance"))
+      const leaf = mimc7.multiHash(owner.address) as unknown as Buffer
+      merkleTree.addLeaf(leaf)
+      // Generate EDDSA signature
+      const eddsaMessage = `${leaf}${owner.tokenAddress.toLowerCase()}${
+        owner.threshold
+      }${network.toLowerCase().substring(0, 1)}`
+      const eddsaSignature = await eddsaSigFromString([
+        ...utils.toUtf8Bytes(eddsaMessage),
+      ])
     }
-    // Generate EDDSA signature
-    const eddsaMessage = `${ownerAddress.toLowerCase()}owns${tokenAddress.toLowerCase()}${network
-      .toLowerCase()
-      .substring(0, 1)}`
-    const eddsaSignature = await eddsaSigFromString([
-      ...utils.toUtf8Bytes(eddsaMessage),
-      balance,
-    ])
-    return {
-      signature: eddsaSignature,
-      message: eddsaMessage,
-      balance: balance.toHexString(),
-    }
+    // return {
+    //   signature: eddsaSignature,
+    //   message: eddsaMessage,
+    //   balance: balance.toHexString(),
+    // }
   }
 
   @Post('/farcaster')

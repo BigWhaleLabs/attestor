@@ -7,6 +7,5 @@ export default class {
   @IsOptional()
   @IsEthereumAddress()
   tokenAddress?: string
-  @IsEthereumAddress()
-  ownerAddress!: string
+  owners!: { address: string; tokenAddress: string; threshold: string }[]
 }
