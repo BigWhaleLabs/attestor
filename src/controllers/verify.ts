@@ -87,48 +87,49 @@ export default class VerifyController {
   async balance(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { network, owners }: BalanceVerifyBody
+    {
+      network,
+      owners,
+      tokenAddress = zeroAddress,
+      threshold,
+    }: BalanceVerifyBody
   ) {
     const provider = networkPick(network, goerliProvider, mainnetProvider)
     // Verify ownership
     let balance: BigNumber
     const mimc7 = await buildMimc7()
-    const merkleTree: MerkleTree = new MerkleTree([], mimc7.multiHash)
+    const merkleTree = new MerkleTree([], mimc7.multiHash)
     const abi = ['function balanceOf(address owner) view returns (uint256)']
 
     for (const owner of owners) {
       try {
         // Check if it's ethereum balance
-        if (owner.tokenAddress === zeroAddress) {
-          balance = await provider.getBalance(owner.address)
+        if (tokenAddress === zeroAddress) {
+          balance = await provider.getBalance(owner)
         } else {
-          const contract = new ethers.Contract(
-            owner.tokenAddress,
-            abi,
-            provider
-          )
-          balance = await contract.balanceOf(owner.address)
+          const contract = new ethers.Contract(tokenAddress, abi, provider)
+          balance = await contract.balanceOf(owner)
           // TODO
-          if (!balance.gte(BigNumber.from(owner.threshold))) return
+          if (!balance.gte(BigNumber.from(threshold))) return
         }
       } catch {
         return ctx.throw(badRequest("Can't fetch the balance"))
       }
-      const leaf = mimc7.multiHash(owner.address) as unknown as Buffer
+      const leaf = mimc7.multiHash(owner) as unknown as Buffer
       merkleTree.addLeaf(leaf)
       // Generate EDDSA signature
-      const eddsaMessage = `${leaf}${owner.tokenAddress.toLowerCase()}${
-        owner.threshold
-      }${network.toLowerCase().substring(0, 1)}`
-      const eddsaSignature = await eddsaSigFromString([
-        ...utils.toUtf8Bytes(eddsaMessage),
-      ])
     }
-    // return {
-    //   signature: eddsaSignature,
-    //   message: eddsaMessage,
-    //   balance: balance.toHexString(),
-    // }
+    const root = merkleTree.getRoot()
+    const eddsaMessage = `${root}${tokenAddress.toLowerCase()}${threshold}${network
+      .toLowerCase()
+      .substring(0, 1)}`
+    const eddsaSignature = await eddsaSigFromString([
+      ...utils.toUtf8Bytes(eddsaMessage),
+    ])
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
   }
 
   @Post('/farcaster')
