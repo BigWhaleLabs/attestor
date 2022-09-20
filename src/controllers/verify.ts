@@ -141,7 +141,7 @@ export default class VerifyController {
     }>(infoUrl)
     if (signerAddress?.toLowerCase() !== address.toLowerCase())
       return ctx.throw(
-        badRequest(`Couldn't find a user with this username ${username}`)
+        badRequest(`Couldn't find a user with the username @${username}`)
       )
     // Generate EDDSA signature
     const eddsaMessage = `${address.toLowerCase()}ownsfarcaster`
