@@ -26,7 +26,7 @@ export async function fetchConnectedAddress(address: string) {
   faddressToConnectedAddresses[address] = connectedAddresses
 }
 
-const step = 3
+const step = 1
 export async function fetchConnectedAddresses(addresses: string[]) {
   checkIfPrimary()
   for (let i = 0; i < addresses.length; i += step) {
