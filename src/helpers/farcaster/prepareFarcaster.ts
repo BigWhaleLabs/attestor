@@ -19,9 +19,13 @@ const idRegistry = new Contract(
 )
 
 let registered = false
-function eventHandler(to: string, id: string) {
+async function eventHandler(to: string, id: string) {
   idsToAddresses[id] = to
-  return fetchConnectedAddress(to)
+  try {
+    await fetchConnectedAddress(to)
+  } catch (error) {
+    console.log(`Error fetching connected address ${to}`, error)
+  }
 }
 function registerToEvents() {
   if (registered) return

@@ -26,17 +26,22 @@ export async function fetchConnectedAddress(address: string) {
   faddressToConnectedAddresses[address] = connectedAddresses
 }
 
+const step = 5
 export async function fetchConnectedAddresses(addresses: string[]) {
   checkIfPrimary()
-  for (let i = 0; i < addresses.length; i += 10) {
+  for (let i = 0; i < addresses.length; i += step) {
     console.log(
-      `Fetching connected addresses ${i} to ${i + 10} / ${addresses.length}`
+      `Fetching connected addresses ${i} to ${i + step} / ${addresses.length}`
     )
-    await Promise.all(
-      addresses
-        .slice(i, i + 10)
-        .map((address) => fetchConnectedAddress(address))
-    )
+    try {
+      await Promise.all(
+        addresses
+          .slice(i, i + step)
+          .map((address) => fetchConnectedAddress(address))
+      )
+    } catch (error) {
+      console.error('Error fetching connected addresses', error)
+    }
   }
 }
 
