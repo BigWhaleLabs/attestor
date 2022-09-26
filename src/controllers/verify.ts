@@ -4,18 +4,12 @@ import { Context } from 'koa'
 import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
-import { formatBytes32String } from 'ethers/lib/utils'
-import {
-  goerliProvider,
-  mainnetProvider,
-  rinkebyProvider,
-} from '@/helpers/providers'
+import { goerliProvider, mainnetProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
-import axios from 'axios'
 import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
