@@ -24,7 +24,10 @@ async function eventHandler(to: string, id: string) {
   try {
     await fetchConnectedAddress(to)
   } catch (error) {
-    console.log(`Error fetching connected address ${to}`, error)
+    console.log(
+      `Error fetching connected address ${to}`,
+      error instanceof Error ? error.message : error
+    )
   }
 }
 function registerToEvents() {

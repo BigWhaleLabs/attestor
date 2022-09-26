@@ -26,7 +26,7 @@ export async function fetchConnectedAddress(address: string) {
   faddressToConnectedAddresses[address] = connectedAddresses
 }
 
-const step = 1
+const step = 5
 export async function fetchConnectedAddresses(addresses: string[]) {
   checkIfPrimary()
   for (let i = 0; i < addresses.length; i += step) {
@@ -40,7 +40,11 @@ export async function fetchConnectedAddresses(addresses: string[]) {
           .map((address) => fetchConnectedAddress(address))
       )
     } catch (error) {
-      console.error('Error fetching connected addresses', error)
+      console.error(
+        'Error fetching connected addresses',
+        error instanceof Error ? error.message : error
+      )
+      i -= step
     }
   }
 }
