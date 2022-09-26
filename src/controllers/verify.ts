@@ -16,9 +16,10 @@ import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import axios from 'axios'
-import ecdsaSigFromString from '@/helpers/ecdsaSigFromString'
-import eddsaSigFromString from '@/helpers/eddsaSigFromString'
+import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
+import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
+import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
 import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
 
@@ -122,26 +123,11 @@ export default class VerifyController {
   async farcaster(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { username, address }: FarcasterVerifyBody
+    { address }: FarcasterVerifyBody
   ) {
-    const abi = ['function usernameToUrl(bytes32 name) view returns (string)']
-    const contract = new ethers.Contract(
-      '0xe3Be01D99bAa8dB9905b33a3cA391238234B79D1',
-      abi,
-      rinkebyProvider
-    )
-    const formatedUsername = formatBytes32String(username)
-    const url = await contract.usernameToUrl(formatedUsername)
-    if (!url) return ctx.throw(badRequest(`Can't find user`))
-    const infoUrl = url.replace('directory', 'proof')
-    const {
-      data: { signerAddress },
-    } = await axios.get<{
-      signerAddress: string
-    }>(infoUrl)
-    if (signerAddress?.toLowerCase() !== address.toLowerCase())
+    if (!(await isAddressConnectedToFarcaster(address)))
       return ctx.throw(
-        badRequest(`Couldn't find a user with the username @${username}`)
+        badRequest(`The Ethereum address should be connected to Farcaster!`)
       )
     // Generate EDDSA signature
     const eddsaMessage = `${address.toLowerCase()}ownsfarcaster`

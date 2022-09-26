@@ -1,8 +1,6 @@
-import { IsEthereumAddress, IsString } from 'amala'
+import { IsEthereumAddress } from 'amala'
 
 export default class {
-  @IsString()
-  username!: string
   @IsEthereumAddress()
   address!: string
 }
