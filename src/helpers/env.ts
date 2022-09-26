@@ -3,7 +3,6 @@ import {
   ETH_NETWORK,
   ETH_RPC,
   ETH_RPC_MAINNET,
-  ETH_RPC_RINKEBY,
 } from '@big-whale-labs/constants'
 import { cleanEnv, num, str } from 'envalid'
 import { cwd } from 'process'
@@ -21,5 +20,4 @@ export default cleanEnv(process.env, {
   ETH_NETWORK: str({ default: ETH_NETWORK }),
   ETH_RPC: str({ default: ETH_RPC }),
   ETH_RPC_MAINNET: str({ default: ETH_RPC_MAINNET }),
-  ETH_RPC_RINKEBY: str({ default: ETH_RPC_RINKEBY }),
 })
