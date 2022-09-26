@@ -13,7 +13,7 @@
     "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@big-whale-labs/constants": "^0.1.32",
+    "@big-whale-labs/constants": "^0.1.33",
     "@big-whale-labs/seal-cred-email": "^1.1.1",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^3.4.1",
@@ -38,8 +38,8 @@
     "@types/node": "^18.7.22",
     "@types/nodemailer": "^6.4.6",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
