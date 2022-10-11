@@ -13,34 +13,34 @@
     "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@big-whale-labs/constants": "^0.1.33",
+    "@big-whale-labs/constants": "^0.1.35",
     "@big-whale-labs/seal-cred-email": "^1.1.1",
     "@hapi/boom": "^10.0.0",
-    "@koa/cors": "^3.4.1",
+    "@koa/cors": "^4.0.0",
     "amala": "^8.0.2",
-    "axios": "^0.27.2",
+    "axios": "^1.1.2",
     "circomlibjs": "^0.1.7",
-    "dotenv": "^16.0.2",
+    "dotenv": "^16.0.3",
     "envalid": "^7.3.1",
     "ethers": "^5.7.1",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^12.0.0",
-    "nodemailer": "^6.7.8",
+    "nodemailer": "^6.8.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@types/imapflow": "^1.0.10",
+    "@types/imapflow": "^1.0.11",
     "@types/koa": "^2.13.5",
     "@types/koa-bodyparser": "^4.3.8",
     "@types/koa-router": "^7.4.4",
     "@types/koa__cors": "^3.3.0",
-    "@types/node": "^18.7.22",
+    "@types/node": "^18.8.4",
     "@types/nodemailer": "^6.4.6",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.38.1",
-    "@typescript-eslint/parser": "^5.38.1",
-    "eslint": "^8.24.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
+    "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-no-relative-import-paths": "^1.4.0",
@@ -51,7 +51,7 @@
     "prettier": "^2.7.1",
     "source-map-support": "^0.5.21",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.4"
   },
   "_moduleAliases": {
     "@": "dist"
