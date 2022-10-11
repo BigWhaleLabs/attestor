@@ -1,5 +1,5 @@
 import { BigNumber, ethers, utils } from 'ethers'
-import { Body, Controller, Ctx, Get, Post } from 'amala'
+import { Body, Controller, Ctx, Get, Post, Version } from 'amala'
 import { Context } from 'koa'
 import { RESERVED_CONTRACT_METADATA } from '@big-whale-labs/constants'
 import { badRequest } from '@hapi/boom'
@@ -134,6 +134,31 @@ export default class VerifyController {
     }
   }
 
+  @Post('/farcaster')
+  @Version('0.2.2')
+  async farcasterCompact(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { address }: FarcasterVerifyBody
+  ) {
+    if (!(await isAddressConnectedToFarcaster(address)))
+      return ctx.throw(
+        badRequest(`The Ethereum address should be connected to Farcaster!`)
+      )
+    // Generate EDDSA signature
+    const farcasterBytes = utils.toUtf8Bytes('farcaster')
+    const eddsaMessage = [
+      0, // "owns" type of attestation,
+      address,
+      ...farcasterBytes,
+    ].map((v) => BigNumber.from(v))
+    const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
   @Post('/ethereum-address')
   async ethereumAddress(
     @Body({ required: true })
@@ -149,6 +174,23 @@ export default class VerifyController {
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
+    }
+  }
+
+  @Post('/ethereum-address')
+  @Version('0.2.2')
+  async ethereumAddressCompact(
+    @Body({ required: true })
+    { signature, message }: AddressVerifyBody
+  ) {
+    // Verify ECDSA signature
+    const ownerAddress = ethers.utils.verifyMessage(message, signature)
+    const ownerAddressNumber = BigNumber.from(ownerAddress)
+    // Generate EDDSA signature
+    const eddsaSignature = await eddsaSigFromString([ownerAddressNumber])
+    return {
+      signature: eddsaSignature,
+      message: [ownerAddressNumber],
     }
   }
 
