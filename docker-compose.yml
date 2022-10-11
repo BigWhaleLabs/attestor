@@ -1,0 +1,56 @@
+services:
+  # Backend
+  backend-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.development
+    restart: unless-stopped
+    ports:
+      - 1337:1337
+    volumes:
+      - ./src:/usr/src
+    environment:
+      - ENVIRONMENT=development
+    profiles:
+      - development
+    hostname: backend
+  backend-production:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.production
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+    profiles:
+      - production
+      - production-no-dns
+    hostname: backend
+  # Reverse proxy
+  caddy:
+    container_name: attestor-proxy-caddy
+    image: caddy:2-alpine
+    restart: unless-stopped
+    command: 'caddy reverse-proxy --from ${DOMAIN} --to http://backend:1337'
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+      - caddy_conf:/config
+    depends_on:
+      - backend-production
+    profiles:
+      - production
+  localtunnel:
+    container_name: attestor-proxy-lt
+    image: node:18
+    restart: unless-stopped
+    command: 'npx localtunnel --port 1337 --local-host backend'
+    depends_on:
+      - backend-production
+    profiles:
+      - production-no-dns
+
+volumes:
+  caddy_data:
+  caddy_conf:

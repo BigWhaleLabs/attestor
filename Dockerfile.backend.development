@@ -1,0 +1,6 @@
+FROM node:18
+WORKDIR /usr
+COPY . ./
+RUN yarn
+EXPOSE 1337
+CMD yarn start

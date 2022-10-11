@@ -10,7 +10,10 @@
     "distribute": "node dist/server.js",
     "start": "tsc-watch --skipLibCheck --onSuccess 'node dist/server.js'",
     "pretty": "prettier --check src",
-    "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src"
+    "lint": "yarn pretty && eslint --max-warnings 0 --ext ts,tsx,json src",
+    "docker-start-development": "docker-compose --profile=development up",
+    "docker-start-production": "docker-compose --profile=production up",
+    "docker-start-production-no-dns": "docker-compose --profile=production-no-dns up"
   },
   "dependencies": {
     "@big-whale-labs/constants": "^0.1.35",
@@ -18,7 +21,7 @@
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^4.0.0",
     "amala": "^8.0.2",
-    "axios": "^1.1.2",
+    "axios": "^0.27.2",
     "circomlibjs": "^0.1.7",
     "dotenv": "^16.0.3",
     "envalid": "^7.3.1",
