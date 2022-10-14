@@ -114,6 +114,35 @@ export default class VerifyController {
   }
 
   @Post('/farcaster')
+  @Version('0.2.2')
+  async farcasterCompact(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { address }: FarcasterVerifyBody
+  ) {
+    if (!(await isAddressConnectedToFarcaster(address)))
+      return ctx.throw(
+        badRequest(`The Ethereum address should be connected to Farcaster!`)
+      )
+    // Generate EDDSA signature
+    const farcasterBytes = utils.toUtf8Bytes('farcaster')
+    const eddsaMessage = [
+      0, // "owns" type of attestation,
+      address.toLowerCase(),
+      ...farcasterBytes,
+    ]
+
+    const eddsaSignature = await eddsaSigFromString(
+      eddsaMessage.map((v) => BigNumber.from(v))
+    )
+
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
+  @Post('/farcaster')
   async farcaster(
     @Ctx() ctx: Context,
     @Body({ required: true })
@@ -134,28 +163,22 @@ export default class VerifyController {
     }
   }
 
-  @Post('/farcaster')
+  @Post('/ethereum-address')
   @Version('0.2.2')
-  async farcasterCompact(
-    @Ctx() ctx: Context,
+  async ethereumAddressCompact(
     @Body({ required: true })
-    { address }: FarcasterVerifyBody
+    { signature, message }: AddressVerifyBody
   ) {
-    if (!(await isAddressConnectedToFarcaster(address)))
-      return ctx.throw(
-        badRequest(`The Ethereum address should be connected to Farcaster!`)
-      )
+    // Verify ECDSA signature
+    const ownerAddress = ethers.utils
+      .verifyMessage(message, signature)
+      .toLowerCase()
+    const ownerAddressNumber = BigNumber.from(ownerAddress)
     // Generate EDDSA signature
-    const farcasterBytes = utils.toUtf8Bytes('farcaster')
-    const eddsaMessage = [
-      0, // "owns" type of attestation,
-      address,
-      ...farcasterBytes,
-    ].map((v) => BigNumber.from(v))
-    const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+    const eddsaSignature = await eddsaSigFromString([ownerAddressNumber])
     return {
       signature: eddsaSignature,
-      message: eddsaMessage,
+      message: ownerAddress,
     }
   }
 
@@ -174,23 +197,6 @@ export default class VerifyController {
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
-    }
-  }
-
-  @Post('/ethereum-address')
-  @Version('0.2.2')
-  async ethereumAddressCompact(
-    @Body({ required: true })
-    { signature, message }: AddressVerifyBody
-  ) {
-    // Verify ECDSA signature
-    const ownerAddress = ethers.utils.verifyMessage(message, signature)
-    const ownerAddressNumber = BigNumber.from(ownerAddress)
-    // Generate EDDSA signature
-    const eddsaSignature = await eddsaSigFromString([ownerAddressNumber])
-    return {
-      signature: eddsaSignature,
-      message: [ownerAddressNumber],
     }
   }
 
