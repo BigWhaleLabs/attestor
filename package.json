@@ -20,6 +20,7 @@
     "@big-whale-labs/seal-cred-email": "^1.1.1",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^4.0.0",
+    "@zk-kit/incremental-merkle-tree": "^1.0.0",
     "amala": "^8.0.2",
     "axios": "^0.27.2",
     "circomlibjs": "^0.1.7",
