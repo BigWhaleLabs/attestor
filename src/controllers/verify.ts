@@ -9,6 +9,7 @@ import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceLargerAnonymitySetVerifyBody from '@/validators/BalanceLargerAnonymitySetVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
+import FarcasterLargerAnonymitySetVerifyBody from '@/validators/FarcasterLargerAnonymitySetVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
@@ -173,7 +174,7 @@ export default class VerifyController {
   async farcasterCompact(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { address }: FarcasterVerifyBody
+    { address, ownerAddresses }: FarcasterLargerAnonymitySetVerifyBody
   ) {
     if (!(await isAddressConnectedToFarcaster(address)))
       return ctx.throw(
@@ -181,15 +182,19 @@ export default class VerifyController {
       )
     // Generate EDDSA signature
     const farcasterBytes = utils.toUtf8Bytes('farcaster')
+    // Create Merkle tree of ownerAddresses
+    const tree = await getMerkleTree(
+      ownerAddresses.map((v) => BigNumber.from(v))
+    )
+    const merkleRoot = BigNumber.from(utils.hexlify(tree.root))
+    // Get network
     const eddsaMessage = [
       0, // "owns" type of attestation,
-      address.toLowerCase(),
+      merkleRoot,
       ...farcasterBytes,
     ]
 
-    const eddsaSignature = await eddsaSigFromString(
-      eddsaMessage.map((v) => BigNumber.from(v))
-    )
+    const eddsaSignature = await eddsaSigFromString(eddsaMessage)
 
     return {
       signature: eddsaSignature,
