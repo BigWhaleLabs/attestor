@@ -6,6 +6,7 @@ import { badRequest } from '@hapi/boom'
 import { buildBabyjub, buildEddsa } from 'circomlibjs'
 import { goerliProvider, mainnetProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
+import BalanceLargerAnonymitySetVerifyBody from '@/validators/BalanceLargerAnonymitySetVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
@@ -13,6 +14,8 @@ import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
+import getBalance from '@/helpers/getBalance'
+import getMerkleTree from '@/helpers/getMerkleTree'
 import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
 import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
@@ -110,6 +113,58 @@ export default class VerifyController {
       signature: eddsaSignature,
       message: eddsaMessage,
       balance: balance.toHexString(),
+    }
+  }
+
+  @Post('/balance')
+  @Version('0.2.2')
+  async balanceWithLargerAnonymitySet(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    {
+      tokenAddress = zeroAddress,
+      network,
+      ownerAddresses,
+      threshold: thresholdString,
+    }: BalanceLargerAnonymitySetVerifyBody
+  ) {
+    const provider = networkPick(network, goerliProvider, mainnetProvider)
+    // Verify ownership
+    const balances = [] as BigNumber[]
+    try {
+      for (const ownerAddress of ownerAddresses) {
+        balances.push(await getBalance(tokenAddress, ownerAddress, provider))
+      }
+    } catch {
+      return ctx.throw(badRequest("Can't fetch the balances"))
+    }
+    // Check balances
+    const threshold = BigNumber.from(thresholdString)
+    for (const balance of balances) {
+      if (balance.lt(threshold)) {
+        return ctx.throw(badRequest('Not enough balance'))
+      }
+    }
+    // Create Merkle tree of ownerAddresses
+    const tree = await getMerkleTree(
+      ownerAddresses.map((v) => BigNumber.from(v))
+    )
+    const merkleRoot = BigNumber.from(utils.hexlify(tree.root))
+    // Get network
+    const networkCompact = network.toLowerCase().substring(0, 1)
+    const networkByte = utils.toUtf8Bytes(networkCompact)[0]
+    // Generate EDDSA signature
+    const eddsaMessage = [
+      0, // "owns" type of attestation
+      merkleRoot,
+      BigNumber.from(tokenAddress),
+      networkByte,
+      threshold,
+    ]
+    const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
     }
   }
 
