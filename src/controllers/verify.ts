@@ -97,10 +97,10 @@ export default class VerifyController {
         balance = await provider.getBalance(ownerAddress)
       } else if (tokenId) {
         const abi = [
-          'function balanceOf(uin256 tokenId, address owner) view returns (uint256)',
+          'function balanceOf(address account, uint256 id) view returns (uint256)',
         ]
         const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(tokenId, ownerAddress)
+        balance = await contract.balanceOf(ownerAddress, tokenId)
       } else {
         const abi = ['function balanceOf(address owner) view returns (uint256)']
         const contract = new ethers.Contract(tokenAddress, abi, provider)
