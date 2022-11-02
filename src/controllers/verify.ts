@@ -174,12 +174,17 @@ export default class VerifyController {
   async farcasterCompact(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { address, ownerAddresses }: FarcasterLargerAnonymitySetVerifyBody
+    { ownerAddresses }: FarcasterLargerAnonymitySetVerifyBody
   ) {
-    if (!(await isAddressConnectedToFarcaster(address)))
+    try {
+      for (const ownerAddress of ownerAddresses) {
+        await isAddressConnectedToFarcaster(ownerAddress)
+      }
+    } catch {
       return ctx.throw(
         badRequest(`The Ethereum address should be connected to Farcaster!`)
       )
+    }
     // Generate EDDSA signature
     const farcasterBytes = utils.toUtf8Bytes('farcaster')
     // Create Merkle tree of ownerAddresses
