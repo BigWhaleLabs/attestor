@@ -84,7 +84,12 @@ export default class VerifyController {
   async balance(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress = zeroAddress, network, ownerAddress }: BalanceVerifyBody
+    {
+      tokenAddress = zeroAddress,
+      network,
+      ownerAddress,
+      tokenId,
+    }: BalanceVerifyBody
   ) {
     const provider = networkPick(network, goerliProvider, mainnetProvider)
     // Verify ownership
@@ -93,6 +98,12 @@ export default class VerifyController {
       // Check if it's ethereum balance
       if (tokenAddress === zeroAddress) {
         balance = await provider.getBalance(ownerAddress)
+      } else if (tokenId) {
+        const abi = [
+          'function balanceOf(address account, uint256 id) view returns (uint256)',
+        ]
+        const contract = new ethers.Contract(tokenAddress, abi, provider)
+        balance = await contract.balanceOf(ownerAddress, tokenId)
       } else {
         const abi = ['function balanceOf(address owner) view returns (uint256)']
         const contract = new ethers.Contract(tokenAddress, abi, provider)
