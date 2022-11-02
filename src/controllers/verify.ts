@@ -170,8 +170,8 @@ export default class VerifyController {
   }
 
   @Post('/farcaster')
-  @Version('0.2.2')
-  async farcasterCompact(
+  @Version('0.2.3')
+  async farcasterWithLargerAnonymitySet(
     @Ctx() ctx: Context,
     @Body({ required: true })
     { ownerAddresses }: FarcasterLargerAnonymitySetVerifyBody
@@ -200,6 +200,35 @@ export default class VerifyController {
     ]
 
     const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
+  @Post('/farcaster')
+  @Version('0.2.2')
+  async farcasterCompact(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { address }: FarcasterVerifyBody
+  ) {
+    if (!(await isAddressConnectedToFarcaster(address)))
+      return ctx.throw(
+        badRequest(`The Ethereum address should be connected to Farcaster!`)
+      )
+    // Generate EDDSA signature
+    const farcasterBytes = utils.toUtf8Bytes('farcaster')
+    const eddsaMessage = [
+      0, // "owns" type of attestation,
+      address.toLowerCase(),
+      ...farcasterBytes,
+    ]
+
+    const eddsaSignature = await eddsaSigFromString(
+      eddsaMessage.map((v) => BigNumber.from(v))
+    )
 
     return {
       signature: eddsaSignature,
