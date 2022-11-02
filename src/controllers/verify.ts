@@ -9,6 +9,7 @@ import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceLargerAnonymitySetVerifyBody from '@/validators/BalanceLargerAnonymitySetVerifyBody'
 import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
+import FarcasterLargerAnonymitySetVerifyBody from '@/validators/FarcasterLargerAnonymitySetVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
@@ -173,6 +174,44 @@ export default class VerifyController {
       threshold,
     ]
     const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
+  @Post('/farcaster')
+  @Version('0.2.3')
+  async farcasterWithLargerAnonymitySet(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { ownerAddresses }: FarcasterLargerAnonymitySetVerifyBody
+  ) {
+    try {
+      for (const ownerAddress of ownerAddresses) {
+        await isAddressConnectedToFarcaster(ownerAddress)
+      }
+    } catch {
+      return ctx.throw(
+        badRequest(`The Ethereum address should be connected to Farcaster!`)
+      )
+    }
+    // Generate EDDSA signature
+    const farcasterBytes = utils.toUtf8Bytes('farcaster')
+    // Create Merkle tree of ownerAddresses
+    const tree = await getMerkleTree(
+      ownerAddresses.map((v) => BigNumber.from(v))
+    )
+    const merkleRoot = BigNumber.from(utils.hexlify(tree.root))
+    // Get network
+    const eddsaMessage = [
+      0, // "owns" type of attestation,
+      merkleRoot,
+      ...farcasterBytes,
+    ]
+
+    const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
