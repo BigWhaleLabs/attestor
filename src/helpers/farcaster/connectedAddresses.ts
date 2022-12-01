@@ -31,7 +31,6 @@ export async function fetchConnectedAddresses(addresses: string[]) {
           .slice(i, i + step)
           .map((address) => fetchConnectedAddress(address))
       )
-      console.log(faddressToConnectedAddresses)
     } catch (error) {
       console.error(
         'Error fetching connected addresses',
@@ -47,6 +46,7 @@ export function isAddressConnected(address: string) {
   console.log('isAddressConnected', address)
   const allConnectedAddresses = Object.values(faddressToConnectedAddresses)
     .reduce((acc, val) => acc.concat(val), [] as string[])
+    .filter((v) => !!v)
     .map((s) => s.toLowerCase())
   console.log(allConnectedAddresses.includes(address.toLowerCase()))
   return allConnectedAddresses.includes(address.toLowerCase())
