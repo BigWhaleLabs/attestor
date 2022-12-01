@@ -43,8 +43,10 @@ export async function fetchConnectedAddresses(addresses: string[]) {
 
 export function isAddressConnected(address: string) {
   checkIfPrimary()
+  console.log('isAddressConnected', address)
   const allConnectedAddresses = Object.values(faddressToConnectedAddresses)
     .reduce((acc, val) => acc.concat(val), [] as string[])
     .map((s) => s.toLowerCase())
+  console.log(allConnectedAddresses.includes(address.toLowerCase()))
   return allConnectedAddresses.includes(address.toLowerCase())
 }
