@@ -1,27 +1,19 @@
 import axios from 'axios'
 import checkIfPrimary from '@/helpers/cluster/checkIfPrimary'
 
-const baseUrl = 'https://api.farcaster.xyz/v1'
-
 export const faddressToConnectedAddresses = {} as {
   [faddress: string]: string[]
 }
 
 export async function fetchConnectedAddress(address: string) {
   checkIfPrimary()
-  const {
-    data: {
-      result: { verifiedAddresses },
-    },
-  } = await axios.get<{
-    result: {
-      verifiedAddresses: {
-        signerAddress: string
-      }[]
-    }
-  }>(`${baseUrl}/verified_addresses/${address}`)
-  const connectedAddresses = verifiedAddresses.map(
-    ({ signerAddress }) => signerAddress
+  const { data } = await axios.get<
+    {
+      connectedAddress: string
+    }[]
+  >(`https://searchcaster.xyz/api/profiles?address=${address}`)
+  const connectedAddresses = data.map(
+    ({ connectedAddress }) => connectedAddress
   )
   faddressToConnectedAddresses[address] = connectedAddresses
 }
