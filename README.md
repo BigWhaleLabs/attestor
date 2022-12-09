@@ -1,10 +1,40 @@
 # Credentials attestor
 
-Node server that generates EDDSA signatures as attestations for a specific credential.
+Node server that generates EDDSA signatures as attestations for specific credentials.
 
-## Installation and local launch
+## Deploying to Google Cloud
 
-1. Clone this repo: `git clone https://github.com/BigWhaleLabs/zk-proof-generator`
+Visit [this tutorial](./docs/gcp.md) for Google Cloud installation
+
+## Deploying to AWS
+
+Visit [this tutorial](./docs/aws.md) for Amazon AWS installation
+
+## Deploying to any VPS with `apt-get` and `bash` installed
+
+Run the following cURL or Wget command to download and launch the attestor:
+
+```bash
+bash <(curl -o- https://raw.githubusercontent.com/BigWhaleLabs/attestor/main/scripts/install.sh) --non-interactive
+```
+
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/BigWhaleLabs/attestor/main/scripts/install.sh) --non-interactive
+```
+
+Note the attestor URL that will be displayed in the end
+
+## Local launch
+
+### Using Docker
+
+1. Clone this repo: `git clone https://github.com/BigWhaleLabs/attestor`
+2. Create `.env` with the environment variables listed below
+3. Run `yarn docker-start-development` or `yarn docker-start-production`
+
+## Without Docker
+
+1. Clone this repo: `git clone https://github.com/BigWhaleLabs/attestor`
 2. Create `.env` with the environment variables listed below
 3. Run `yarn` in the root folder
 4. Run `yarn start`
