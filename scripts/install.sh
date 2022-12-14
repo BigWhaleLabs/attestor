@@ -31,7 +31,7 @@ then
   sudo docker compose --profile=production-no-dns up -d
   echo "Waiting 10 seconds for the proxy to start..."
   sleep 10
-  url=$(sudo docker logs proxy-lt | grep -oP 'https://\K.*')
+  url=$(sudo docker logs attestor-proxy-lt | grep -oP 'https://\K.*')
   echo "==============================="
   echo "Your SealHub Attestor is running! It might take a minute for it to set everything up though. It has the following URL:"
   echo "$url"
