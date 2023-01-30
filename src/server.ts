@@ -9,7 +9,7 @@ import runApp from '@/helpers/runApp'
 
 const totalCPUs = os.cpus().length
 
-void (async () => {
+void (() => {
   if (Cluster.isPrimary) {
     console.log(`Number of CPUs is ${totalCPUs}`)
     console.log(`Primary ${process.pid} is running`)
