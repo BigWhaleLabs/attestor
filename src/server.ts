@@ -15,7 +15,7 @@ void (async () => {
     console.log(`Primary ${process.pid} is running`)
 
     console.log('Preparing Farcaster...')
-    await prepareFarcaster()
+    void prepareFarcaster()
     console.log('Farcaster prepared!')
 
     // Fork workers.
