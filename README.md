@@ -22,7 +22,7 @@ bash <(curl -o- https://raw.githubusercontent.com/BigWhaleLabs/attestor/main/scr
 bash <(wget -qO- https://raw.githubusercontent.com/BigWhaleLabs/attestor/main/scripts/install.sh)
 ```
 
-Use `--non-interactive` flag at to skip the interactive mode and use the default values.
+Use `--non-interactive` flag at to skip the interactive mode and use the default values
 
 ```bash
 bash <(curl -o- https://raw.githubusercontent.com/BigWhaleLabs/attestor/main/scripts/install.sh) --non-interactive
