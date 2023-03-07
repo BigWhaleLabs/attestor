@@ -43,17 +43,27 @@ function registerToEvents() {
 
 async function fillIdsToAddresses() {
   // Fetch events
-  const logs = await goerliProvider.getLogs({
-    address: idRegistryAddress,
-    fromBlock: startBlock,
-    toBlock: 'latest',
-    topics: [
-      [
-        '0x3cd6a0ffcc37406d9958e09bba79ff19d8237819eb2e1911f9edbce656499c87', // Register
-        '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', // Transfer
+  const lastBlockNumber = await goerliProvider.getBlockNumber()
+  const logs = []
+  for (
+    let currentBlockNumber = startBlock;
+    currentBlockNumber <= lastBlockNumber;
+    currentBlockNumber += 300000
+  ) {
+    const batch = await goerliProvider.getLogs({
+      address: idRegistryAddress,
+      fromBlock: currentBlockNumber,
+      toBlock: currentBlockNumber + 300000,
+      topics: [
+        [
+          '0x3cd6a0ffcc37406d9958e09bba79ff19d8237819eb2e1911f9edbce656499c87', // Register
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', // Transfer
+        ],
       ],
-    ],
-  })
+    })
+    logs.push(...batch)
+  }
+
   // Sort events
   const sortedLogs = logs.sort((a, b) =>
     a.blockNumber > b.blockNumber ? 1 : -1
@@ -78,5 +88,6 @@ export default async function () {
     console.log('Fetching connected addresses...')
     await fetchConnectedAddresses(Object.values(idsToAddresses))
     console.log('Fetched connected addresses!')
+    console.log('Farcaster prepared!')
   }
 }

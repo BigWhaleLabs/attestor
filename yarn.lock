@@ -14,10 +14,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@big-whale-labs/constants@npm:^0.1.39":
-  version: 0.1.39
-  resolution: "@big-whale-labs/constants@npm:0.1.39"
-  checksum: 69807bda7e9ffb4561d1adb9fb62d34257b3099c1d52131adc55e4b10a859135200bc22ce8a80bce28a584ebba76e4c4f6254988415fbbddb8ad8cb20573b742
+"@big-whale-labs/constants@npm:^0.1.73":
+  version: 0.1.73
+  resolution: "@big-whale-labs/constants@npm:0.1.73"
+  checksum: 4ef845aa29b362748c6de31077d788c45fd2b38e2144d95e221ddc449776bbc4df085ea500d172ffc4048d7a42f8c8839017797a6d286411c025f7d467be9ea8
   languageName: node
   linkType: hard
 
@@ -1611,7 +1611,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "attestor@workspace:."
   dependencies:
-    "@big-whale-labs/constants": ^0.1.39
+    "@big-whale-labs/constants": ^0.1.73
     "@big-whale-labs/seal-cred-email": ^1.1.2
     "@hapi/boom": ^10.0.0
     "@koa/cors": ^4.0.0

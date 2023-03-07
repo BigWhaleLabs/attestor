@@ -16,7 +16,6 @@ void (() => {
 
     console.log('Preparing Farcaster...')
     void prepareFarcaster()
-    console.log('Farcaster prepared!')
 
     // Fork workers.
     for (let i = 0; i < totalCPUs; i++) {
