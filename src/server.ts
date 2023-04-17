@@ -21,10 +21,10 @@ void (() => {
     for (let i = 0; i < totalCPUs; i++) {
       const worker = Cluster.fork()
       worker.on('message', (message: string) => {
-        const { promiseId, address } = JSON.parse(message)
+        const { address, promiseId } = JSON.parse(message)
         try {
           const isConnected = isAddressConnected(address)
-          worker.send(JSON.stringify({ promiseId, isConnected }))
+          worker.send(JSON.stringify({ isConnected, promiseId }))
         } catch (error) {
           worker.send(JSON.stringify({ error, promiseId }))
         }

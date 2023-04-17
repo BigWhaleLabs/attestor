@@ -73,10 +73,10 @@ export default class VerifyController {
       const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
       const signature = await eddsaSigFromString(domainBytes)
       void sendEmail({
-        to: email,
-        subject: "Here's your token!",
-        secret: signature,
         domain,
+        secret: signature,
+        subject: "Here's your token!",
+        to: email,
       })
     }
   }
@@ -86,9 +86,9 @@ export default class VerifyController {
     @Ctx() ctx: Context,
     @Body({ required: true })
     {
-      tokenAddress = zeroAddress,
       network,
       ownerAddress,
+      tokenAddress = zeroAddress,
       tokenId,
     }: BalanceVerifyBody
   ) {
@@ -122,9 +122,9 @@ export default class VerifyController {
       balance,
     ])
     return {
-      signature: eddsaSignature,
-      message: eddsaMessage,
       balance: balance.toHexString(),
+      message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -134,10 +134,10 @@ export default class VerifyController {
     @Ctx() ctx: Context,
     @Body({ required: true })
     {
-      tokenAddress = zeroAddress,
       network,
       ownerAddresses,
       threshold: thresholdString,
+      tokenAddress = zeroAddress,
     }: BalanceLargerAnonymitySetVerifyBody
   ) {
     const provider = networkPick(network, goerliProvider, mainnetProvider)
@@ -175,8 +175,8 @@ export default class VerifyController {
     ]
     const eddsaSignature = await eddsaSigFromString(eddsaMessage)
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -213,8 +213,8 @@ export default class VerifyController {
     const eddsaSignature = await eddsaSigFromString(eddsaMessage)
 
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -242,8 +242,8 @@ export default class VerifyController {
     )
 
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -263,8 +263,8 @@ export default class VerifyController {
       ...utils.toUtf8Bytes(eddsaMessage),
     ])
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -272,7 +272,7 @@ export default class VerifyController {
   @Version('0.2.2')
   async ethereumAddressCompact(
     @Body({ required: true })
-    { signature, message }: AddressVerifyBody
+    { message, signature }: AddressVerifyBody
   ) {
     // Verify ECDSA signature
     const ownerAddress = ethers.utils
@@ -282,15 +282,15 @@ export default class VerifyController {
     // Generate EDDSA signature
     const eddsaSignature = await eddsaSigFromString([ownerAddressNumber])
     return {
-      signature: eddsaSignature,
       message: ownerAddress,
+      signature: eddsaSignature,
     }
   }
 
   @Post('/ethereum-address')
   async ethereumAddress(
     @Body({ required: true })
-    { signature, message }: AddressVerifyBody
+    { message, signature }: AddressVerifyBody
   ) {
     // Verify ECDSA signature
     const ownerAddress = ethers.utils.verifyMessage(message, signature)
@@ -300,8 +300,8 @@ export default class VerifyController {
       utils.toUtf8Bytes(eddsaMessage)
     )
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 
@@ -309,7 +309,7 @@ export default class VerifyController {
   async contractMetadata(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { tokenAddress, network }: MetadataVerifyBody
+    { network, tokenAddress }: MetadataVerifyBody
   ) {
     // Get metadata
     let name: string
@@ -353,8 +353,8 @@ export default class VerifyController {
     ]
     const signature = await ecdsaSigFromString(new Uint8Array(message))
     return {
-      signature,
       message: utils.hexlify(message),
+      signature,
     }
   }
 }
