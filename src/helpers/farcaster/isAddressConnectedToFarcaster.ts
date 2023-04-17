@@ -9,7 +9,7 @@ const isConnectedPromises = {} as {
 }
 
 process.on('message', (message: string) => {
-  const { promiseId, isConnected, error } = JSON.parse(message)
+  const { error, isConnected, promiseId } = JSON.parse(message)
   if (error) {
     isConnectedPromises[promiseId]?.rej(error)
   } else {
@@ -25,11 +25,11 @@ export default function (address: string) {
     if (!process.send) {
       throw new Error('process.send is undefined')
     }
-    isConnectedPromises[promiseId] = { res, rej }
+    isConnectedPromises[promiseId] = { rej, res }
     process.send(
       JSON.stringify({
-        promiseId,
         address,
+        promiseId,
       })
     )
   })

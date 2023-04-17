@@ -6,20 +6,20 @@ const user = env.SMTP_USER
 const pass = env.SMTP_PASS
 
 const emailer = createTransport({
+  auth: {
+    pass,
+    user,
+  },
   host: 'box.mail.sealcred.xyz',
   port: 465,
   secure: true,
-  auth: {
-    user,
-    pass,
-  },
 })
 
 export default async function ({
-  to,
-  subject,
-  secret,
   domain,
+  secret,
+  subject,
+  to,
 }: {
   to: string
   subject: string
@@ -27,12 +27,12 @@ export default async function ({
   domain: string
 }) {
   try {
-    const { html } = generateTokenHtml({ secret, domain })
+    const { html } = generateTokenHtml({ domain, secret })
     await emailer.sendMail({
       from: `"SealCred" <${user}>`,
-      to,
-      subject,
       html,
+      subject,
+      to,
     })
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)

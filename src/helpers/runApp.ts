@@ -13,9 +13,9 @@ export default async function () {
   const router = new Router()
   await bootstrapControllers({
     app,
-    router,
     basePath: '/',
     controllers: [resolve(__dirname, '../controllers/*')],
+    router,
     versions: ['0.2.1', '0.2.2', '0.2.3'],
   })
   app.use(cors({ origin: '*' }))
