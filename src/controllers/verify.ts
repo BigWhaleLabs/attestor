@@ -11,10 +11,14 @@ import BalanceVerifyBody from '@/validators/BalanceVerifyBody'
 import EmailVerifyBody from '@/validators/EmailVerifyBody'
 import FarcasterLargerAnonymitySetVerifyBody from '@/validators/FarcasterLargerAnonymitySetVerifyBody'
 import FarcasterVerifyBody from '@/validators/FarcasterVerifyBody'
+import LinkedInBody from '@/validators/LinkedInBody'
+import LinkedInProfile from '@/models/LinkedInProfile'
 import MetadataVerifyBody from '@/validators/MetadataVerifyBody'
 import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
+import eddsaPoseidonSigFromString from '@/helpers/signatures/eddsaPoseidonSigFromString'
 import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
+import fetchUserinfo from '@/helpers/linkedin/fetchUserinfo'
 import getBalance from '@/helpers/getBalance'
 import getMerkleTree from '@/helpers/getMerkleTree'
 import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
@@ -174,6 +178,35 @@ export default class VerifyController {
       threshold,
     ]
     const eddsaSignature = await eddsaSigFromString(eddsaMessage)
+    return {
+      signature: eddsaSignature,
+      message: eddsaMessage,
+    }
+  }
+
+  @Post('/linkedin')
+  async linkedInProfileAttestor(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    { token }: LinkedInBody
+  ) {
+    let linkedInProfile: LinkedInProfile
+
+    try {
+      linkedInProfile = await fetchUserinfo(token)
+    } catch {
+      return ctx.throw(
+        badRequest(`Unable to verify your profile, please try again later!`)
+      )
+    }
+
+    const eddsaMessage = [
+      '0', // "owns" type of attestation,
+      utils.hexlify(utils.toUtf8Bytes(linkedInProfile.sub)),
+    ]
+
+    const eddsaSignature = await eddsaPoseidonSigFromString(eddsaMessage)
+
     return {
       signature: eddsaSignature,
       message: eddsaMessage,
