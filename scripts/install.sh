@@ -3,7 +3,7 @@ sudo apt-get update
 # Remove old Docker installations
 sudo apt-get remove -y docker docker-engine docker.io containerd runc
 # Install packages required for Docker
-sudo apt-get install -y ca-certificates curl gnupg lsb-release build-essentials
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
 # Add Docker official GPG key
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
