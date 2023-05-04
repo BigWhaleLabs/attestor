@@ -61,8 +61,10 @@ And you should be good to go! Feel free to fork and submit pull requests.
 | `ECDSA_PRIVATE_KEY` | \* ECDSA private key for signing the attestations                          |
 | `PORT`              | Port to run server on (defaults to 1337)                                   |
 | `ETH_NETWORK`       | Ethereum network (defaults to @bwl/constants)                              |
+| `ETH_POLYGON_NETWORK`       | Ethereum network (defaults to @bwl/constants)                      |
 | `ETH_RPC`           | Ethereum node RPC URI (defaults to @bwl/constants)                         |
 | `ETH_RPC_MAINNET`   | Ethereum mainnet node RPC URI (defaults to @bwl/constants)                 |
+| `ETH_RPC_POLYGON`   | Polygon node RPC URI (defaults to @bwl/constants)                          |
 | `DOMAIN`            | Domain name for caddy, DNS should point at the IP where the code is hosted |
 | `ENVIRONMENT`       | Environment name (defaults to `development`)                               |
 

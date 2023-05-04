@@ -96,20 +96,7 @@ export default class VerifyController {
     // Verify ownership
     let balance: BigNumber
     try {
-      // Check if it's ethereum balance
-      if (tokenAddress === zeroAddress) {
-        balance = await provider.getBalance(ownerAddress)
-      } else if (tokenId) {
-        const abi = [
-          'function balanceOf(address account, uint256 id) view returns (uint256)',
-        ]
-        const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(ownerAddress, tokenId)
-      } else {
-        const abi = ['function balanceOf(address owner) view returns (uint256)']
-        const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(ownerAddress)
-      }
+      balance = await getBalance(provider, ownerAddress, tokenAddress, tokenId)
     } catch {
       return ctx.throw(badRequest("Can't fetch the balance"))
     }
@@ -145,7 +132,7 @@ export default class VerifyController {
     const balances = [] as BigNumber[]
     try {
       for (const ownerAddress of ownerAddresses) {
-        balances.push(await getBalance(tokenAddress, ownerAddress, provider))
+        balances.push(await getBalance(provider, ownerAddress, tokenAddress))
       }
     } catch {
       return ctx.throw(badRequest("Can't fetch the balances"))
