@@ -20,8 +20,7 @@ import getMerkleTree from '@/helpers/getMerkleTree'
 import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
 import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
-
-const zeroAddress = '0x0000000000000000000000000000000000000000'
+import zeroAddress from '@/models/zeroAddress'
 
 function padZeroesOnRightUint8(array: Uint8Array, length: number) {
   const padding = new Uint8Array(length - array.length)
