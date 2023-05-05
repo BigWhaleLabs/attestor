@@ -17,6 +17,34 @@ sudo apt-get install -y git docker-ce docker-ce-cli containerd.io docker-compose
 git clone https://github.com/BigWhaleLabs/attestor.git
 cd attestor
 
+# Check if ECDSA_PRIVATE_KEY already exists in .env
+if grep -q "^ECDSA_PRIVATE_KEY=" .env; then
+  echo "ECDSA_PRIVATE_KEY already exists in .env file, skipping."
+else
+  # Generate a private key using openssl
+  private_key=$(openssl ecparam -name secp256k1 -genkey -noout | openssl ec -text -noout | grep priv -A 3 | tail -n +2 | tr -d '\n[:space:]:' | sed 's/^00//')
+
+  # Append the private key to an existing .env file
+  echo "ECDSA_PRIVATE_KEY=0x$private_key" >> ../.env
+
+  # Print the private key to the console for verification
+  echo "ECDSA PRIVATE KEY key: $private_key"
+fi
+
+# Check if EDDSA_PRIVATE_KEY already exists in .env
+if grep -q "^EDDSA_PRIVATE_KEY=" .env; then
+  echo "EDDSA_PRIVATE_KEY already exists in .env file, skipping."
+else
+  # Generate a private key using openssl
+  private_key=$(openssl ecparam -name secp256k1 -genkey -noout | openssl ec -text -noout | grep priv -A 3 | tail -n +2 | tr -d '\n[:space:]:' | sed 's/^00//')
+
+  # Append the private key to an existing .env file
+  echo "EDDSA_PRIVATE_KEY=0x$private_key" >> ../.env
+
+  # Print the private key to the console for verification
+  echo "EDDSA PRIVATE KEY key: $private_key"
+fi
+
 if [ -z "$1" ] 
 then
   # Ask if user has a custom domain, if he doesn't launch the attestor without DNS, if he does take the name from the user and put it to the .env
@@ -32,11 +60,7 @@ then
   echo "Waiting 10 seconds for the proxy to start..."
   sleep 10
   url=$(sudo docker logs attestor-proxy-lt | grep -oP 'https://\K.*')
-  echo "==============================="
-  echo "Your SealHub Attestor is running! It might take a minute for it to set everything up though. It has the following URL:"
-  echo "$url"
-  echo "You can safelly close this window now. The attestor will keep running."
-  echo "==============================="
+
 else 
   # Put the domain name in the .env
   echo "DOMAIN=$domain" >> .env
@@ -46,9 +70,45 @@ else
   read
   # Start production profile
   sudo docker compose --profile=production up -d
-  echo "==============================="
-  echo "Your SealHub Attestor is running! It might take a minute for it to set everything up though. It has the following URL:"
-  echo "$domain"
-  echo "You can safelly close this window now. The attestor will keep running"
-  echo "==============================="
 fi
+
+if [ -n "$url" ]; then
+  server="$url"
+else
+  server="https://$domain"
+fi
+
+echo "==============================="
+echo "Your SealHub Attestor is running! It might take a minute for it to set everything up though. It has the following URL:"
+echo "$server"
+
+endpoint_url="$server/v0.2.1/verify/eddsa-public-key"
+
+counter=0
+
+while true; do
+  response=$(curl -s -w "\n%{http_code}\n" "$endpoint_url")
+
+  body=$(echo "$response" | sed '$d')
+  code=$(echo "$response" | tail -n 1)
+
+  if [ "$code" -eq 200 ]; then
+    attestor_public_key=$(echo "$body" | sed -e 's/^.*"x":[[:space:]]*"//' -e 's/".*$//')
+
+    echo "Your attestor public key is:"
+    echo "$attestor_public_key"
+    break
+  fi
+
+  counter=$((counter+1))
+  echo "Waiting 5 seconds for next request..."
+  sleep 5
+
+  if [ "$(($counter % 5))" -eq 0 ]; then
+    echo "Still waiting for response..."
+  fi
+done
+
+echo "You can safelly close this window now. The attestor will keep running."
+echo "==================================="
+
