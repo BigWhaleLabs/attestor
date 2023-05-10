@@ -1,33 +1,32 @@
 import { Body, Controller, Ctx, Post } from 'amala'
+import { Context } from 'vm'
+import { badRequest } from '@hapi/boom'
+import { ethers, utils } from 'ethers'
+import { polygonProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
 import TokenBody from '@/validators/TokenBody'
-import { ethers, utils } from 'ethers'
-import { badRequest } from '@hapi/boom'
-import { Context } from 'vm'
+import eddsaSigPoseidon from '@/helpers/signatures/eddsaSigPoseidon'
+import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
-import { polygonProvider } from '@/helpers/providers'
 import poseidonHash from '@/helpers/signatures/poseidonHash'
-import fetchUserProfile from '@/helpers/twitter/twitterProfile'
-import zeroAddress from '@/models/zeroAddress'
-import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import sendEmail from '@/helpers/sendEmail'
+import zeroAddress from '@/models/zeroAddress'
 
 @Controller('/verify-yc')
 export default class VerifyYCController {
   @Post('/email-unique')
-  async sendUniqueEmail(@Body({ required: true }) { email }: EmailUniqueVerifyBody) {
+  async sendUniqueEmail(
+    @Body({ required: true }) { email }: EmailUniqueVerifyBody
+  ) {
     // 1. Create `emailHash = poseidon([0, email])`, (0 = email attestation)
-    const eddsaMessage = [
-      '0',
-      utils.hexlify(utils.toUtf8Bytes(email)),
-    ]
-    
+    const eddsaMessage = ['0', utils.hexlify(utils.toUtf8Bytes(email))]
+
     const emailHash = await poseidonHash(eddsaMessage)
 
     // 2. Sign `[0, emailHash]` with EdDSA, (0 = yc attestation)
-    const eddsaSignature = await eddsaSigFromString([
+    const eddsaSignature = await eddsaSigPoseidon([
       0,
       ...utils.toUtf8Bytes(emailHash),
     ])
@@ -44,7 +43,6 @@ export default class VerifyYCController {
     })
   }
 
-
   @Post('/twitter')
   async twitter(
     @Ctx() ctx: Context,
@@ -57,28 +55,20 @@ export default class VerifyYCController {
       userId = id
     } catch (e) {
       console.log(e)
-      return ctx.throw(badRequest("Failed to fetch user profile"))
+      return ctx.throw(badRequest('Failed to fetch user profile'))
     }
 
-
     // 2. Get userIdHash = poseidon([1, userId]), (1 = twitter attestation)
-    const eddsaMessage = [
-      '1',
-      utils.hexlify(utils.toUtf8Bytes(userId)),
-    ]
-    
+    const eddsaMessage = ['1', userId]
     const userIdHash = await poseidonHash(eddsaMessage)
 
     // 3. Sign `[0, userIdHash]` with EdDSA, (0 = yc attestation)
-    const eddsaSignature = await eddsaSigFromString([
-      0,
-      ...utils.toUtf8Bytes(userIdHash),
-    ])
+    const eddsaSignature = await eddsaSigPoseidon([0, userIdHash])
 
     // 4. Return signature
     return {
+      message: [0, userIdHash],
       signature: eddsaSignature,
-      message: eddsaMessage,
     }
   }
 
@@ -101,12 +91,17 @@ export default class VerifyYCController {
       .toLowerCase()
 
     if (signerAddress !== ownerAddress) {
-      return ctx.throw(badRequest("Invalid ownerAddress"))
+      return ctx.throw(badRequest('Invalid ownerAddress'))
     }
 
     // 2. Verify that ownerAddress owns at least threshold of tokenAddress (if tokenAddress is undefined, use ETH)
     try {
-      const balance = await getBalance(polygonProvider, ownerAddress, tokenAddress, tokenId)
+      const balance = await getBalance(
+        polygonProvider,
+        ownerAddress,
+        tokenAddress,
+        tokenId
+      )
       if (balance.lt(threshold)) {
         return ctx.throw(badRequest('Not enough balance'))
       }
@@ -121,19 +116,19 @@ export default class VerifyYCController {
       utils.hexlify(utils.toUtf8Bytes(threshold)),
       utils.hexlify(utils.toUtf8Bytes(tokenAddress)),
     ]
-    
+
     const balanceHash = await poseidonHash(eddsaMessage)
 
     // 4. Sign `[0, balanceHash]` with EdDSA, (0 = yc attestation)
-    const eddsaSignature = await eddsaSigFromString([
+    const eddsaSignature = await eddsaSigPoseidon([
       0,
       ...utils.toUtf8Bytes(balanceHash),
     ])
 
     // 5. Return signature
     return {
-      signature: eddsaSignature,
       message: eddsaMessage,
+      signature: eddsaSignature,
     }
   }
 }
