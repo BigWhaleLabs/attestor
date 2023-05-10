@@ -6,7 +6,7 @@ export default function (
   provider: providers.Provider,
   ownerAddress: string,
   tokenAddress = zeroAddress,
-  tokenId?: number,
+  tokenId?: number
 ) {
   if (tokenAddress === zeroAddress) {
     return provider.getBalance(ownerAddress)
@@ -16,7 +16,7 @@ export default function (
     ]
     const contract = new ethers.Contract(tokenAddress, abi, provider)
     return contract.balanceOf(ownerAddress, tokenId)
-  }  else {
+  } else {
     const abi = ['function balanceOf(address owner) view returns (uint256)']
     const contract = new ethers.Contract(tokenAddress, abi, provider)
     return contract.balanceOf(ownerAddress)
