@@ -6,7 +6,7 @@ import { polygonProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
-import TokenBody from '@/validators/TokenBody'
+import TwitterBody from '@/validators/TwitterBody'
 import eddsaSigPoseidon from '@/helpers/signatures/eddsaSigPoseidon'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
@@ -46,7 +46,7 @@ export default class VerifyYCController {
   @Post('/twitter')
   async twitter(
     @Ctx() ctx: Context,
-    @Body({ required: true }) { token }: TokenBody
+    @Body({ required: true }) { token }: TwitterBody
   ) {
     // 1. Verify token
     let userId = ''
