@@ -4,9 +4,11 @@ import { badRequest } from '@hapi/boom'
 import { ethers, utils } from 'ethers'
 import { polygonProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
+import Attestation from '@/models/Attestation'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
 import TwitterBody from '@/validators/TwitterBody'
+import YCVerification from '@/models/YCVerification'
 import eddsaSigPoseidon from '@/helpers/signatures/eddsaSigPoseidon'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
@@ -20,21 +22,20 @@ export default class VerifyYCController {
   async sendUniqueEmail(
     @Body({ required: true }) { email }: EmailUniqueVerifyBody
   ) {
-    // 1. Create `emailHash = poseidon([0, email])`, (0 = email attestation)
-    const eddsaMessage = ['0', utils.hexlify(utils.toUtf8Bytes(email))]
+    const eddsaMessage = [
+      YCVerification.email,
+      utils.hexlify(utils.toUtf8Bytes(email)),
+    ]
 
     const emailHash = await poseidonHash(eddsaMessage)
 
-    // 2. Sign `[0, emailHash]` with EdDSA, (0 = yc attestation)
     const eddsaSignature = await eddsaSigPoseidon([
-      0,
+      Attestation.yc,
       ...utils.toUtf8Bytes(emailHash),
     ])
 
     const domain = email.split('@')[1].toLowerCase()
 
-    // TODO:
-    // 3. Send email with signature (must look nice and ketl branded)
     void sendEmail({
       domain,
       secret: eddsaSignature,
@@ -48,7 +49,6 @@ export default class VerifyYCController {
     @Ctx() ctx: Context,
     @Body({ required: true }) { token }: TwitterBody
   ) {
-    // 1. Verify token
     let userId = ''
     try {
       const { id } = await fetchUserProfile(token)
@@ -58,14 +58,11 @@ export default class VerifyYCController {
       return ctx.throw(badRequest('Failed to fetch user profile'))
     }
 
-    // 2. Get userIdHash = poseidon([1, userId]), (1 = twitter attestation)
-    const eddsaMessage = ['1', userId]
+    const eddsaMessage = [YCVerification.twitter, userId]
     const userIdHash = await poseidonHash(eddsaMessage)
 
-    // 3. Sign `[0, userIdHash]` with EdDSA, (0 = yc attestation)
-    const eddsaSignature = await eddsaSigPoseidon([0, userIdHash])
+    const eddsaSignature = await eddsaSigPoseidon([Attestation.yc, userIdHash])
 
-    // 4. Return signature
     return {
       message: [0, userIdHash],
       signature: eddsaSignature,
@@ -85,7 +82,6 @@ export default class VerifyYCController {
       tokenId,
     }: BalanceUniqueVerifyBody & AddressVerifyBody
   ) {
-    // 1. Verify signature and that ownerAddress signed the signature
     const signerAddress = ethers.utils
       .verifyMessage(message, signature)
       .toLowerCase()
@@ -94,7 +90,6 @@ export default class VerifyYCController {
       return ctx.throw(badRequest('Invalid ownerAddress'))
     }
 
-    // 2. Verify that ownerAddress owns at least threshold of tokenAddress (if tokenAddress is undefined, use ETH)
     try {
       const balance = await getBalance(
         polygonProvider,
@@ -109,9 +104,8 @@ export default class VerifyYCController {
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 
-    // 3. Create `balanceHash = poseidon([2, ownerAddress, threshold, tokenAddress])`, (2 = balance attestation)
     const eddsaMessage = [
-      '2',
+      YCVerification.balance,
       utils.hexlify(utils.toUtf8Bytes(ownerAddress)),
       utils.hexlify(utils.toUtf8Bytes(threshold)),
       utils.hexlify(utils.toUtf8Bytes(tokenAddress)),
@@ -119,13 +113,11 @@ export default class VerifyYCController {
 
     const balanceHash = await poseidonHash(eddsaMessage)
 
-    // 4. Sign `[0, balanceHash]` with EdDSA, (0 = yc attestation)
     const eddsaSignature = await eddsaSigPoseidon([
-      0,
+      Attestation.yc,
       ...utils.toUtf8Bytes(balanceHash),
     ])
 
-    // 5. Return signature
     return {
       message: eddsaMessage,
       signature: eddsaSignature,

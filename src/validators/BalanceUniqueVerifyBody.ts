@@ -1,4 +1,4 @@
-import { IsEthereumAddress, IsNumberString, IsOptional, IsString } from 'amala'
+import { IsEthereumAddress, IsNumberString, IsOptional } from 'amala'
 
 export default class {
   @IsOptional()
@@ -6,7 +6,7 @@ export default class {
   tokenAddress?: string
   @IsEthereumAddress()
   ownerAddress!: string
-  @IsString()
+  @IsNumberString()
   threshold!: string
   @IsOptional()
   @IsNumberString()

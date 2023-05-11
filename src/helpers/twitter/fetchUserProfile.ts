@@ -3,7 +3,7 @@ import axios from 'axios'
 
 export default async function fetchUserProfile(token: string) {
   const { data } = await axios.get<TwitterProfile>(
-    `https://api.twitter.com/2/users/me`,
+    'https://api.twitter.com/2/users/me',
     {
       headers: {
         Authorization: `Bearer ${token}`,
