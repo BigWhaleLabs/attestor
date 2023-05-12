@@ -29,16 +29,13 @@ export default class VerifyYCController {
 
     const emailHash = await poseidonHash(eddsaMessage)
 
-    const eddsaSignature = await eddsaSigPoseidon([
-      Attestation.yc,
-      ...utils.toUtf8Bytes(emailHash),
-    ])
+    const eddsaSignature = await eddsaSigPoseidon([Attestation.yc, emailHash])
 
     const domain = email.split('@')[1].toLowerCase()
 
     void sendEmail({
       domain,
-      secret: eddsaSignature,
+      secret: `${emailHash}:${eddsaSignature}`,
       subject: "Here's your token!",
       to: email,
     })
@@ -64,7 +61,7 @@ export default class VerifyYCController {
     const eddsaSignature = await eddsaSigPoseidon([Attestation.yc, userIdHash])
 
     return {
-      message: [0, userIdHash],
+      message: [Attestation.yc, userIdHash],
       signature: eddsaSignature,
     }
   }
