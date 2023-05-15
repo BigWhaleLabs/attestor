@@ -35,6 +35,7 @@ export default class VerifyYCController {
 
     void sendEmail({
       domain,
+      forKetl: true,
       secret: `${emailHash}:${eddsaSignature}`,
       subject: "Here's your token!",
       to: email,
