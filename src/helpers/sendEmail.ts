@@ -1,7 +1,7 @@
 import { createTransport } from 'nodemailer'
-import { generateTokenHtml as generateScEmail } from '@big-whale-labs/seal-cred-email'
+import { generateTokenHtml as scEmail } from '@big-whale-labs/seal-cred-email'
 import env from '@/helpers/env'
-import generateKetlEmail from '@big-whale-labs/ketl-email'
+import ketlEmail from '@big-whale-labs/ketl-email'
 
 const user = env.SMTP_USER
 const pass = env.SMTP_PASS
@@ -31,8 +31,8 @@ export default async function ({
 }) {
   try {
     const { html } = forKetl
-      ? generateKetlEmail({ domain, secret })
-      : generateScEmail({ domain, secret })
+      ? ketlEmail({ domain, secret })
+      : scEmail({ domain, secret })
 
     const from = forKetl ? 'Ketl' : 'SealCred'
 
