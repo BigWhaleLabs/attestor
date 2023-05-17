@@ -1,7 +1,8 @@
 enum Attestation {
-  yc = 0,
-  founder = 1,
-  vc = 2,
+  KetlTeam = 0,
+  YC = 1,
+  Founder = 2,
+  VC = 3,
 }
 
 export default Attestation

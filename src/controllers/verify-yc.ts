@@ -29,7 +29,7 @@ export default class VerifyYCController {
 
     const emailHash = await poseidonHash(eddsaMessage)
 
-    const eddsaSignature = await eddsaSigPoseidon([Attestation.yc, emailHash])
+    const eddsaSignature = await eddsaSigPoseidon([Attestation.YC, emailHash])
 
     const domain = email.split('@')[1].toLowerCase()
 
@@ -51,17 +51,17 @@ export default class VerifyYCController {
       const { id } = await fetchUserProfile(token)
       userId = id
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
     }
 
     const eddsaMessage = [YCVerification.twitter, userId]
     const userIdHash = await poseidonHash(eddsaMessage)
 
-    const eddsaSignature = await eddsaSigPoseidon([Attestation.yc, userIdHash])
+    const eddsaSignature = await eddsaSigPoseidon([Attestation.YC, userIdHash])
 
     return {
-      message: [Attestation.yc, userIdHash],
+      message: [Attestation.YC, userIdHash],
       signature: eddsaSignature,
     }
   }
@@ -111,7 +111,7 @@ export default class VerifyYCController {
     const balanceHash = await poseidonHash(eddsaMessage)
 
     const eddsaSignature = await eddsaSigPoseidon([
-      Attestation.yc,
+      Attestation.YC,
       ...utils.toUtf8Bytes(balanceHash),
     ])
 

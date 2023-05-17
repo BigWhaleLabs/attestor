@@ -1,8 +1,10 @@
 import { IsEnum, IsString } from 'amala'
+import Attestation from '@/models/Attestation'
 
 enum AttestationType {
-  vc = 2,
-  founder = 1,
+  VC = Attestation.VC,
+  Founder = Attestation.Founder,
+  KetlTeam = Attestation.KetlTeam,
 }
 
 export default class {
