@@ -12,7 +12,7 @@ import Verification from '@/models/Verification'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
 import sendEmail from '@/helpers/sendEmail'
-import signVerificationMessage from '@/helpers/signatures/signVerificationMessage'
+import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
 import zeroAddress from '@/models/zeroAddress'
 
 @Controller('/verify-yc')
@@ -21,7 +21,7 @@ export default class VerifyYCController {
   async sendUniqueEmail(
     @Body({ required: true }) { email }: EmailUniqueVerifyBody
   ) {
-    const { message, signature } = await signVerificationMessage(
+    const { message, signature } = await signAttestationMessage(
       Attestation.YC,
       Verification.email,
       utils.hexlify(utils.toUtf8Bytes(email))
@@ -45,7 +45,7 @@ export default class VerifyYCController {
     try {
       const { id } = await fetchUserProfile(token)
 
-      return signVerificationMessage(Attestation.YC, Verification.twitter, id)
+      return signAttestationMessage(Attestation.YC, Verification.twitter, id)
     } catch (e) {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
@@ -87,7 +87,7 @@ export default class VerifyYCController {
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 
-    return signVerificationMessage(
+    return signAttestationMessage(
       Attestation.YC,
       Verification.balance,
       utils.hexlify(utils.toUtf8Bytes(ownerAddress)),

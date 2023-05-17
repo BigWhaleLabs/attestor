@@ -1,8 +1,13 @@
+import { BigNumber } from 'ethers'
 import { buildPoseidon } from 'circomlibjs'
 
-export default async function (message: string[]) {
-  const poseidon = await buildPoseidon()
+let poseidon: typeof buildPoseidon
+export default async function (
+  message: (number | string | BigNumber)[] | Uint8Array,
+  toString?: boolean
+) {
+  if (!poseidon) poseidon = await buildPoseidon()
   const F = poseidon.F
 
-  return F.toString(poseidon(message))
+  return toString ? F.toString(poseidon(message)) : poseidon(message)
 }
