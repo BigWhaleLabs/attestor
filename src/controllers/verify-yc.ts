@@ -8,12 +8,11 @@ import Attestation from '@/models/Attestation'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
 import TwitterBody from '@/validators/TwitterBody'
-import YCVerification from '@/models/YCVerification'
-import eddsaSigPoseidon from '@/helpers/signatures/eddsaSigPoseidon'
+import Verification from '@/models/Verification'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
-import poseidonHash from '@/helpers/signatures/poseidonHash'
 import sendEmail from '@/helpers/sendEmail'
+import signVerificationMessage from '@/helpers/signatures/signVerificationMessage'
 import zeroAddress from '@/models/zeroAddress'
 
 @Controller('/verify-yc')
@@ -22,20 +21,16 @@ export default class VerifyYCController {
   async sendUniqueEmail(
     @Body({ required: true }) { email }: EmailUniqueVerifyBody
   ) {
-    const eddsaMessage = [
-      YCVerification.email,
-      utils.hexlify(utils.toUtf8Bytes(email)),
-    ]
-
-    const emailHash = await poseidonHash(eddsaMessage)
-
-    const eddsaSignature = await eddsaSigPoseidon([Attestation.YC, emailHash])
-
+    const { message, signature } = await signVerificationMessage(
+      Attestation.YC,
+      Verification.email,
+      utils.hexlify(utils.toUtf8Bytes(email))
+    )
     const domain = email.split('@')[1].toLowerCase()
 
     void sendEmail({
       domain,
-      secret: `${emailHash}:${eddsaSignature}`,
+      secret: `${message[1]}:${signature}`,
       subject: "Here's your token!",
       to: email,
     })
@@ -46,23 +41,13 @@ export default class VerifyYCController {
     @Ctx() ctx: Context,
     @Body({ required: true }) { token }: TwitterBody
   ) {
-    let userId = ''
     try {
       const { id } = await fetchUserProfile(token)
-      userId = id
+
+      return signVerificationMessage(Attestation.YC, Verification.twitter, id)
     } catch (e) {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
-    }
-
-    const eddsaMessage = [YCVerification.twitter, userId]
-    const userIdHash = await poseidonHash(eddsaMessage)
-
-    const eddsaSignature = await eddsaSigPoseidon([Attestation.YC, userIdHash])
-
-    return {
-      message: [Attestation.YC, userIdHash],
-      signature: eddsaSignature,
     }
   }
 
@@ -101,23 +86,12 @@ export default class VerifyYCController {
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 
-    const eddsaMessage = [
-      YCVerification.balance,
+    return signVerificationMessage(
+      Attestation.YC,
+      Verification.balance,
       utils.hexlify(utils.toUtf8Bytes(ownerAddress)),
       utils.hexlify(utils.toUtf8Bytes(threshold)),
-      utils.hexlify(utils.toUtf8Bytes(tokenAddress)),
-    ]
-
-    const balanceHash = await poseidonHash(eddsaMessage)
-
-    const eddsaSignature = await eddsaSigPoseidon([
-      Attestation.YC,
-      ...utils.toUtf8Bytes(balanceHash),
-    ])
-
-    return {
-      message: eddsaMessage,
-      signature: eddsaSignature,
-    }
+      utils.hexlify(utils.toUtf8Bytes(tokenAddress))
+    )
   }
 }
