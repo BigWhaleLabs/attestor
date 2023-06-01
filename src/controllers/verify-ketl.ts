@@ -42,7 +42,7 @@ export default class VerifyKetlController {
     void sendEmail({
       domain,
       forKetl: true,
-      secret: `${message[1]}:${signature}`,
+      secret: `${message[0]}:${message[1]}:${signature}`,
       subject: "Here's your token!",
       to: email,
     })
