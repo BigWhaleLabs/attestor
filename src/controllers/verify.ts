@@ -16,6 +16,7 @@ import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
 import getBalance from '@/helpers/getBalance'
+import getEmailDomain from '@/helpers/getEmailDomain'
 import getMerkleTree from '@/helpers/getMerkleTree'
 import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
 import networkPick from '@/helpers/networkPick'
@@ -68,7 +69,7 @@ export default class VerifyController {
   @Post('/email')
   async sendEmail(@Body({ required: true }) { emails }: EmailVerifyBody) {
     for (const email of emails.sort()) {
-      const domain = email.split('@')[1].toLowerCase()
+      const domain = getEmailDomain(email)
       const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
       const signature = await eddsaSigFromString(domainBytes)
       void sendEmail({

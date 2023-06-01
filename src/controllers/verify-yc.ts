@@ -1,7 +1,7 @@
 import { Body, Controller, Ctx, Post } from 'amala'
 import { Context } from 'vm'
 import { badRequest } from '@hapi/boom'
-import { ethers, utils } from 'ethers'
+import { ethers } from 'ethers'
 import { polygonProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
 import Attestation from '@/models/Attestation'
@@ -11,6 +11,8 @@ import TwitterBody from '@/validators/TwitterBody'
 import Verification from '@/models/Verification'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
+import getEmailDomain from '@/helpers/getEmailDomain'
+import hexlifyString from '@/helpers/hexlifyString'
 import sendEmail from '@/helpers/sendEmail'
 import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
 import zeroAddress from '@/models/zeroAddress'
@@ -24,9 +26,9 @@ export default class VerifyYCController {
     const { message, signature } = await signAttestationMessage(
       Attestation.YC,
       Verification.email,
-      utils.hexlify(utils.toUtf8Bytes(email))
+      hexlifyString(email)
     )
-    const domain = email.split('@')[1].toLowerCase()
+    const domain = getEmailDomain(email)
 
     void sendEmail({
       domain,
@@ -90,9 +92,9 @@ export default class VerifyYCController {
     return signAttestationMessage(
       Attestation.YC,
       Verification.balance,
-      utils.hexlify(utils.toUtf8Bytes(ownerAddress.toLowerCase())),
+      hexlifyString(ownerAddress.toLowerCase()),
       threshold,
-      utils.hexlify(utils.toUtf8Bytes(tokenAddress))
+      hexlifyString(tokenAddress)
     )
   }
 }
