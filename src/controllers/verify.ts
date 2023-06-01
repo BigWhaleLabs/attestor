@@ -16,12 +16,12 @@ import ecdsaSigFromString from '@/helpers/signatures/ecdsaSigFromString'
 import eddsaSigFromString from '@/helpers/signatures/eddsaSigFromString'
 import env from '@/helpers/env'
 import getBalance from '@/helpers/getBalance'
+import getEmailDomain from '@/helpers/getEmailDomain'
 import getMerkleTree from '@/helpers/getMerkleTree'
 import isAddressConnectedToFarcaster from '@/helpers/farcaster/isAddressConnectedToFarcaster'
 import networkPick from '@/helpers/networkPick'
 import sendEmail from '@/helpers/sendEmail'
-
-const zeroAddress = '0x0000000000000000000000000000000000000000'
+import zeroAddress from '@/models/zeroAddress'
 
 function padZeroesOnRightUint8(array: Uint8Array, length: number) {
   const padding = new Uint8Array(length - array.length)
@@ -69,7 +69,7 @@ export default class VerifyController {
   @Post('/email')
   async sendEmail(@Body({ required: true }) { emails }: EmailVerifyBody) {
     for (const email of emails.sort()) {
-      const domain = email.split('@')[1].toLowerCase()
+      const domain = getEmailDomain(email)
       const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
       const signature = await eddsaSigFromString(domainBytes)
       void sendEmail({
@@ -96,20 +96,7 @@ export default class VerifyController {
     // Verify ownership
     let balance: BigNumber
     try {
-      // Check if it's ethereum balance
-      if (tokenAddress === zeroAddress) {
-        balance = await provider.getBalance(ownerAddress)
-      } else if (tokenId) {
-        const abi = [
-          'function balanceOf(address account, uint256 id) view returns (uint256)',
-        ]
-        const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(ownerAddress, tokenId)
-      } else {
-        const abi = ['function balanceOf(address owner) view returns (uint256)']
-        const contract = new ethers.Contract(tokenAddress, abi, provider)
-        balance = await contract.balanceOf(ownerAddress)
-      }
+      balance = await getBalance(provider, ownerAddress, tokenAddress, tokenId)
     } catch {
       return ctx.throw(badRequest("Can't fetch the balance"))
     }
@@ -145,9 +132,10 @@ export default class VerifyController {
     const balances = [] as BigNumber[]
     try {
       for (const ownerAddress of ownerAddresses) {
-        balances.push(await getBalance(tokenAddress, ownerAddress, provider))
+        balances.push(await getBalance(provider, ownerAddress, tokenAddress))
       }
-    } catch {
+    } catch (e) {
+      console.error(e)
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
     // Check balances

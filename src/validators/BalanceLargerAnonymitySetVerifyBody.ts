@@ -1,4 +1,4 @@
-import { IsEnum, IsEthereumAddress, IsOptional, IsString } from 'amala'
+import { IsEnum, IsEthereumAddress, IsNumberString, IsOptional } from 'amala'
 import Network from '@/models/Network'
 
 export default class {
@@ -9,6 +9,6 @@ export default class {
   tokenAddress?: string
   @IsEthereumAddress({ each: true })
   ownerAddresses!: string[]
-  @IsString()
+  @IsNumberString()
   threshold!: string
 }

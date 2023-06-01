@@ -1,14 +1,14 @@
 import { BigNumber, utils } from 'ethers'
-import { buildEddsa, buildMimc7 } from 'circomlibjs'
+import { buildEddsa } from 'circomlibjs'
 import env from '@/helpers/env'
+import poseidonHash from '@/helpers/signatures/poseidonHash'
 
 const privateKey = utils.arrayify(env.EDDSA_PRIVATE_KEY)
 
 export default async function (message: (number | BigNumber)[] | Uint8Array) {
-  const mimc7 = await buildMimc7()
-  const M = mimc7.multiHash(message)
+  const hash = await poseidonHash(message)
   const eddsa = await buildEddsa()
-  const signature = eddsa.signMiMC(privateKey, M)
+  const signature = eddsa.signPoseidon(privateKey, hash)
   const packedSignature = eddsa.packSignature(signature)
   return utils.hexlify(packedSignature)
 }
