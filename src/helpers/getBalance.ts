@@ -10,15 +10,15 @@ export default function (
 ) {
   if (tokenAddress === zeroAddress) {
     return provider.getBalance(ownerAddress)
-  } else if (tokenId) {
+  } else if (typeof tokenId === 'undefined') {
+    const abi = ['function balanceOf(address owner) view returns (uint256)']
+    const contract = new ethers.Contract(tokenAddress, abi, provider)
+    return contract.balanceOf(ownerAddress)
+  } else {
     const abi = [
       'function balanceOf(address account, uint256 id) view returns (uint256)',
     ]
     const contract = new ethers.Contract(tokenAddress, abi, provider)
     return contract.balanceOf(ownerAddress, tokenId)
-  } else {
-    const abi = ['function balanceOf(address owner) view returns (uint256)']
-    const contract = new ethers.Contract(tokenAddress, abi, provider)
-    return contract.balanceOf(ownerAddress)
   }
 }
