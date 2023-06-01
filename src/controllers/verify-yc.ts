@@ -86,6 +86,7 @@ export default class VerifyYCController {
         return ctx.throw(badRequest('Not enough balance'))
       }
     } catch (e) {
+      console.error(e)
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 

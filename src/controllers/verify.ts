@@ -134,7 +134,8 @@ export default class VerifyController {
       for (const ownerAddress of ownerAddresses) {
         balances.push(await getBalance(provider, ownerAddress, tokenAddress))
       }
-    } catch {
+    } catch (e) {
+      console.error(e)
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
     // Check balances
