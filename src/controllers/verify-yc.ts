@@ -69,7 +69,7 @@ export default class VerifyYCController {
       .verifyMessage(message, signature)
       .toLowerCase()
 
-    if (signerAddress !== ownerAddress) {
+    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
       return ctx.throw(badRequest('Invalid ownerAddress'))
     }
 
@@ -83,15 +83,15 @@ export default class VerifyYCController {
       if (balance.lt(threshold)) {
         return ctx.throw(badRequest('Not enough balance'))
       }
-    } catch {
+    } catch (e) {
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 
     return signAttestationMessage(
       Attestation.YC,
       Verification.balance,
-      utils.hexlify(utils.toUtf8Bytes(ownerAddress)),
-      utils.hexlify(utils.toUtf8Bytes(threshold)),
+      utils.hexlify(utils.toUtf8Bytes(ownerAddress.toLowerCase())),
+      threshold,
       utils.hexlify(utils.toUtf8Bytes(tokenAddress))
     )
   }
