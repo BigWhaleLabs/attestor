@@ -1,10 +1,6 @@
-import { IsEnum, IsString } from 'amala'
-import Attestation from '@/models/Attestation'
+import { IsString } from 'amala'
 
 export default class {
   @IsString()
   token!: string
-
-  @IsEnum([Attestation.VC, Attestation.Founder, Attestation.KetlTeam])
-  type!: Attestation
 }

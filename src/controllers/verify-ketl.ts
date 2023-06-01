@@ -4,10 +4,11 @@ import { badRequest } from '@hapi/boom'
 import { ethers } from 'ethers'
 import { polygonProvider } from '@/helpers/providers'
 import AddressVerifyBody from '@/validators/AddressVerifyBody'
-import Attestation from '@/models/Attestation'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
+import TokenBody from '@/validators/TokenBody'
 import TwitterBody from '@/validators/TwitterBody'
+import TypeAttestation from '@/validators/TypeAttestation'
 import Verification from '@/models/Verification'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
@@ -17,14 +18,22 @@ import sendEmail from '@/helpers/sendEmail'
 import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
 import zeroAddress from '@/models/zeroAddress'
 
-@Controller('/verify-yc')
-export default class VerifyYCController {
+@Controller('/verify-ketl')
+export default class VerifyKetlController {
+  @Post('/token')
+  token(
+    @Body({ required: true }) { token, type }: TokenBody & TypeAttestation
+  ) {
+    return signAttestationMessage(type, hexlifyString(token))
+  }
+
   @Post('/email-unique')
   async sendUniqueEmail(
-    @Body({ required: true }) { email }: EmailUniqueVerifyBody
+    @Body({ required: true })
+    { email, type }: EmailUniqueVerifyBody & TypeAttestation
   ) {
     const { message, signature } = await signAttestationMessage(
-      Attestation.YC,
+      type,
       Verification.email,
       hexlifyString(email)
     )
@@ -42,12 +51,12 @@ export default class VerifyYCController {
   @Post('/twitter')
   async twitter(
     @Ctx() ctx: Context,
-    @Body({ required: true }) { token }: TwitterBody
+    @Body({ required: true }) { token, type }: TwitterBody & TypeAttestation
   ) {
     try {
       const { id } = await fetchUserProfile(token)
 
-      return signAttestationMessage(Attestation.YC, Verification.twitter, id)
+      return signAttestationMessage(type, Verification.twitter, id)
     } catch (e) {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
@@ -65,7 +74,8 @@ export default class VerifyYCController {
       threshold,
       tokenAddress = zeroAddress,
       tokenId,
-    }: BalanceUniqueVerifyBody & AddressVerifyBody
+      type,
+    }: BalanceUniqueVerifyBody & AddressVerifyBody & TypeAttestation
   ) {
     const signerAddress = ethers.utils
       .verifyMessage(message, signature)
@@ -91,7 +101,7 @@ export default class VerifyYCController {
     }
 
     return signAttestationMessage(
-      Attestation.YC,
+      type,
       Verification.balance,
       hexlifyString(ownerAddress.toLowerCase()),
       threshold,
