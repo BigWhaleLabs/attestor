@@ -1,13 +1,13 @@
-import Attestation from '@/models/Attestation'
+import AttestationType from '@/models/AttestationType'
 import eddsaSigPoseidon from '@/helpers/signatures/eddsaSigPoseidon'
 import poseidonHash from '@/helpers/signatures/poseidonHash'
 
 export default async function signAttestationMessage(
-  attestation: Attestation,
-  ...eddsaMessage: string[]
+  attestationType: AttestationType,
+  ...attestation: string[]
 ) {
-  const hash = await poseidonHash(eddsaMessage, true)
-  const message = [attestation, hash]
+  const attestationHash = await poseidonHash(attestation, true)
+  const message = [attestationType, attestationHash]
   const signature = await eddsaSigPoseidon(message)
 
   return {

@@ -3,13 +3,13 @@ import { Context } from 'vm'
 import { badRequest } from '@hapi/boom'
 import { ethers } from 'ethers'
 import { polygonProvider } from '@/helpers/providers'
-import AddressVerifyBody from '@/validators/AddressVerifyBody'
+import AttestationType from '@/validators/AttestationType'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
-import EmailUniqueVerifyBody from '@/validators/EmailUniqueVerifyBody'
-import TokenBody from '@/validators/TokenBody'
+import Email from '@/validators/Email'
+import Signature from '@/validators/Signature'
+import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
-import TypeAttestation from '@/validators/TypeAttestation'
-import Verification from '@/models/Verification'
+import VerificationType from '@/models/VerificationType'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getBalance from '@/helpers/getBalance'
 import getEmailDomain from '@/helpers/getEmailDomain'
@@ -21,28 +21,27 @@ import zeroAddress from '@/models/zeroAddress'
 @Controller('/verify-ketl')
 export default class VerifyKetlController {
   @Post('/token')
-  token(
-    @Body({ required: true }) { token, type }: TokenBody & TypeAttestation
-  ) {
+  token(@Body({ required: true }) { token, type }: AttestationType & Token) {
     return signAttestationMessage(type, hexlifyString(token))
   }
 
   @Post('/email-unique')
   async sendUniqueEmail(
     @Body({ required: true })
-    { email, type }: EmailUniqueVerifyBody & TypeAttestation
+    { email, type }: AttestationType & Email
   ) {
     const { message, signature } = await signAttestationMessage(
       type,
-      Verification.email,
+      VerificationType.email,
       hexlifyString(email)
     )
     const domain = getEmailDomain(email)
+    const attestationHash = message[1]
 
     void sendEmail({
       domain,
       forKetl: true,
-      secret: `${message[0]}:${message[1]}:${signature}`,
+      secret: `${type}${attestationHash}${signature}`,
       subject: "Here's your token!",
       to: email,
     })
@@ -51,12 +50,12 @@ export default class VerifyKetlController {
   @Post('/twitter')
   async twitter(
     @Ctx() ctx: Context,
-    @Body({ required: true }) { token, type }: TwitterBody & TypeAttestation
+    @Body({ required: true }) { token, type }: TwitterBody & AttestationType
   ) {
     try {
       const { id } = await fetchUserProfile(token)
 
-      return signAttestationMessage(type, Verification.twitter, id)
+      return signAttestationMessage(type, VerificationType.twitter, id)
     } catch (e) {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
@@ -75,7 +74,7 @@ export default class VerifyKetlController {
       tokenAddress = zeroAddress,
       tokenId,
       type,
-    }: BalanceUniqueVerifyBody & AddressVerifyBody & TypeAttestation
+    }: BalanceUniqueVerifyBody & Signature & AttestationType
   ) {
     const signerAddress = ethers.utils
       .verifyMessage(message, signature)
@@ -102,7 +101,7 @@ export default class VerifyKetlController {
 
     return signAttestationMessage(
       type,
-      Verification.balance,
+      VerificationType.balance,
       hexlifyString(ownerAddress.toLowerCase()),
       threshold,
       hexlifyString(tokenAddress)
