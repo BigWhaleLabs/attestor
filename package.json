@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@big-whale-labs/constants": "^0.1.73",
-    "@big-whale-labs/ketl-email": "^0.1.10",
+    "@big-whale-labs/ketl-email": "^0.1.13",
     "@big-whale-labs/seal-cred-email": "^1.1.2",
     "@hapi/boom": "^10.0.0",
     "@koa/cors": "^4.0.0",
