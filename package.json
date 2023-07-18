@@ -14,7 +14,8 @@
     "lint": "yarn pretty && eslint --max-warnings 0 ./src/",
     "docker-start-development": "docker-compose --profile=development up",
     "docker-start-production": "docker-compose --profile=production up",
-    "docker-start-production-no-dns": "docker-compose --profile=production-no-dns up"
+    "docker-start-production-no-dns": "docker-compose --profile=production-no-dns up",
+    "docker-update-image": "docker build -t bigwhalelabs/attestor -f Dockerfile.backend.production . && docker push bigwhalelabs/attestor"
   },
   "dependencies": {
     "@big-whale-labs/constants": "^0.1.73",
