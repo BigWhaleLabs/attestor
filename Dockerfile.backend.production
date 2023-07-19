@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:11.15
+FROM --platform=linux/amd64 node:18
 WORKDIR /usr
 COPY . ./
 RUN yarn
