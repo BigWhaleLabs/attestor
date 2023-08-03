@@ -2,5 +2,6 @@ FROM --platform=linux/amd64 node:18
 WORKDIR /usr
 COPY . ./
 RUN yarn
+RUN yarn build
 EXPOSE 1337
 CMD yarn distribute
