@@ -1,0 +1,3 @@
+[submodule "merkleTrees"]
+	path = merkleTrees
+	url = git@github.com:BigWhaleLabs/ketl-merkle-trees.git
