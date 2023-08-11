@@ -21,6 +21,7 @@ import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
 import zeroAddress from '@/models/zeroAddress'
 
 const allowlistMap = getAllowlistMap()
+
 @Controller('/verify-ketl')
 export default class VerifyKetlController {
   @Post('/token')
