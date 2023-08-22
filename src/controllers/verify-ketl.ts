@@ -1,4 +1,4 @@
-import { Body, Controller, Ctx, Post } from 'amala'
+import { Body, Controller, Ctx, Post, Version } from 'amala'
 import { Context } from 'vm'
 import { badRequest, notFound } from '@hapi/boom'
 import { ethers } from 'ethers'
@@ -24,8 +24,9 @@ const allowlistMap = getAllowlistMap()
 
 @Controller('/verify-ketl')
 export default class VerifyKetlController {
+  @Version('0.2.2')
   @Post('/token')
-  token(
+  multipleToken(
     @Ctx() ctx: Context,
     @Body({ required: true }) { token, types }: AttestationTypeList & Token
   ) {
@@ -45,8 +46,14 @@ export default class VerifyKetlController {
     return Promise.all(attestations)
   }
 
+  @Post('/token')
+  token(@Body({ required: true }) { token, type }: AttestationType & Token) {
+    return signAttestationMessage(type, hexlifyString(token))
+  }
+
   @Post('/email-unique')
-  async sendUniqueEmail(
+  @Version('0.2.2')
+  async sendMultipleEmailAttestation(
     @Ctx() ctx: Context,
     @Body({ required: true })
     { email, types }: AttestationTypeList & Email
@@ -55,7 +62,6 @@ export default class VerifyKetlController {
 
     for (const type of types) {
       const allowlist = allowlistMap.get(type)
-      console.log(allowlist)
       if (!allowlist?.has(`email:${email}`)) continue
       const { message, signature } = await signAttestationMessage(
         type,
@@ -66,7 +72,7 @@ export default class VerifyKetlController {
         const attestationHash = message[1]
         secret.push(attestationHash)
       }
-      secret.push(`${type}${signature}`)
+      secret.push(`a${type}${signature}`)
     }
 
     if (!secret.length)
@@ -86,8 +92,31 @@ export default class VerifyKetlController {
     })
   }
 
+  @Post('/email-unique')
+  async sendUniqueEmail(
+    @Body({ required: true })
+    { email, type }: AttestationType & Email
+  ) {
+    const { message, signature } = await signAttestationMessage(
+      type,
+      VerificationType.email,
+      hexlifyString(email)
+    )
+    const domain = getEmailDomain(email)
+    const attestationHash = message[1]
+
+    void sendEmail({
+      domain,
+      forKetl: true,
+      secret: `${type}${attestationHash}${signature}`,
+      subject: "Here's your token!",
+      to: email,
+    })
+  }
+
   @Post('/twitter')
-  async twitter(
+  @Version('0.2.2')
+  async multipleTwitterAttestation(
     @Ctx() ctx: Context,
     @Body({ required: true })
     { token, types }: TwitterBody & AttestationTypeList
@@ -111,6 +140,21 @@ export default class VerifyKetlController {
           )
         )
       return Promise.all(attestations)
+    } catch (e) {
+      console.error(e)
+      return ctx.throw(badRequest('Failed to fetch user profile'))
+    }
+  }
+
+  @Post('/twitter')
+  async twitter(
+    @Ctx() ctx: Context,
+    @Body({ required: true }) { token, type }: TwitterBody & AttestationType
+  ) {
+    try {
+      const { id } = await fetchUserProfile(token)
+
+      return signAttestationMessage(type, VerificationType.twitter, id)
     } catch (e) {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
