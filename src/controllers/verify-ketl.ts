@@ -72,7 +72,7 @@ export default class VerifyKetlController {
         const attestationHash = message[1]
         secret.push(attestationHash)
       }
-      secret.push(`a${type}${signature}`)
+      secret.push(`t${type}${signature}`)
     }
 
     if (!secret.length)
@@ -159,6 +159,70 @@ export default class VerifyKetlController {
       console.error(e)
       return ctx.throw(badRequest('Failed to fetch user profile'))
     }
+  }
+
+  @Post('/balance-unique')
+  @Version('0.2.2')
+  async multipleBalanceAttestation(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    {
+      message,
+      ownerAddress,
+      signature,
+      threshold,
+      tokenAddress = zeroAddress,
+      tokenId,
+      types,
+    }: BalanceUniqueVerifyBody & Signature & AttestationTypeList
+  ) {
+    const signerAddress = ethers.utils
+      .verifyMessage(message, signature)
+      .toLowerCase()
+
+    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+      return ctx.throw(badRequest('Invalid ownerAddress'))
+    }
+
+    try {
+      const balance = await getBalance(
+        polygonProvider,
+        ownerAddress,
+        tokenAddress,
+        tokenId
+      )
+      if (balance.lt(threshold)) {
+        return ctx.throw(badRequest('Not enough balance'))
+      }
+    } catch (e) {
+      console.error(e)
+      return ctx.throw(badRequest("Can't fetch the balances"))
+    }
+
+    const attestations = []
+    for (const type of types) {
+      const allowlist = allowlistMap.get(type)
+      if (
+        allowlist?.has(`orangedao:${ownerAddress}`) ||
+        allowlist?.has(`bwlnft:${ownerAddress}`)
+      )
+        attestations.push(
+          signAttestationMessage(
+            type,
+            VerificationType.balance,
+            hexlifyString(ownerAddress.toLowerCase()),
+            threshold,
+            hexlifyString(tokenAddress)
+          )
+        )
+    }
+    if (!attestations.length)
+      return ctx.throw(
+        notFound(
+          `Couldn't find the invitation for this Twitter handle. Please, try another one`
+        )
+      )
+    return attestations
   }
 
   @Post('/balance-unique')
