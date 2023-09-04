@@ -40,7 +40,7 @@ export default class VerifyKetlController {
     if (!attestations.length)
       return ctx.throw(
         notFound(
-          `Couldn't find the invitation for this token. Please, try another one`
+          "Couldn't find the invitation for this token. Please, try another one"
         )
       )
     return Promise.all(attestations)
@@ -78,7 +78,7 @@ export default class VerifyKetlController {
     if (!secret.length)
       return ctx.throw(
         notFound(
-          `Couldn't find the invitation for this email address. Please, try another one`
+          "Couldn't find the invitation for this email address. Please, try another one"
         )
       )
 
@@ -136,7 +136,7 @@ export default class VerifyKetlController {
       if (!attestations.length)
         return ctx.throw(
           notFound(
-            `Couldn't find the invitation for this Twitter handle. Please, try another one`
+            "Couldn't find the invitation for this Twitter handle. Please, try another one"
           )
         )
       return Promise.all(attestations)
