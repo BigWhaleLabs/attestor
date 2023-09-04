@@ -20,6 +20,7 @@ import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getAllowlistMap from '@/helpers/getAllowlistMap'
 import getBalance from '@/helpers/getBalance'
 import getEmailDomain from '@/helpers/getEmailDomain'
+import handleInvitationError from '@/helpers/handleInvitationError'
 import hexlifyString from '@/helpers/hexlifyString'
 import sendEmail from '@/helpers/sendEmail'
 import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
@@ -43,11 +44,7 @@ export default class VerifyKetlController {
     }
 
     if (!attestations.length)
-      return ctx.throw(
-        notFound(
-          "Couldn't find the invitation for this token. Please, try another one"
-        )
-      )
+      return ctx.throw(notFound(handleInvitationError('token')))
     return Promise.all(attestations)
   }
 
@@ -81,11 +78,7 @@ export default class VerifyKetlController {
     }
 
     if (!secret.length)
-      return ctx.throw(
-        notFound(
-          "Couldn't find the invitation for this email address. Please, try another one"
-        )
-      )
+      return ctx.throw(notFound(handleInvitationError('email')))
 
     const domain = getEmailDomain(email)
     void sendEmail({
@@ -141,11 +134,7 @@ export default class VerifyKetlController {
     }
 
     if (!attestations.length)
-      return ctx.throw(
-        notFound(
-          `Couldn't find the invitation for this Twitter handle. Please, try another one`
-        )
-      )
+      return ctx.throw(notFound(handleInvitationError('Twitter handle')))
 
     return Promise.all(attestations)
   }
@@ -228,11 +217,7 @@ export default class VerifyKetlController {
         )
     }
     if (!attestations.length)
-      return ctx.throw(
-        notFound(
-          `Couldn't find the invitation for this wallet. Please, try another one`
-        )
-      )
+      return ctx.throw(notFound(handleInvitationError('Twitter wallet')))
     return Promise.all(attestations)
   }
 
