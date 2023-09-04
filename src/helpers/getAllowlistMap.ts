@@ -11,10 +11,9 @@ function getAllowlist(attestationType: AttestationType) {
     )
     const file = fs.readFileSync(filePath, 'utf8')
     const allowlist = file.split('\n')
-    const filteredAllowlist = allowlist.filter(
+    return allowlist.filter(
       (record: string) => !/^#/.test(record) && record !== ''
     )
-    return filteredAllowlist
   } catch (e) {
     return []
   }
