@@ -1,5 +1,9 @@
 import { Body, Controller, Ctx, Post, Version } from 'amala'
 import { Context } from 'vm'
+import {
+  KETL_BWL_NFT_CONTRACT,
+  YC_ALUM_NFT_CONTRACT,
+} from '@big-whale-labs/constants'
 import { badRequest, notFound } from '@hapi/boom'
 import { ethers } from 'ethers'
 import { polygonProvider } from '@/helpers/providers'
@@ -7,6 +11,7 @@ import AttestationType from '@/validators/AttestationType'
 import AttestationTypeList from '@/validators/AttestationTypeList'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import Email from '@/validators/Email'
+import OrangeDAOTokenAddress from '@/validators/OrangeDAOTokenAddress'
 import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
@@ -72,7 +77,7 @@ export default class VerifyKetlController {
         const attestationHash = message[1]
         secret.push(attestationHash)
       }
-      secret.push(`a${type}${signature}`)
+      secret.push(`t${type}${signature}`)
     }
 
     if (!secret.length)
@@ -121,29 +126,28 @@ export default class VerifyKetlController {
     @Body({ required: true })
     { token, types }: TwitterBody & AttestationTypeList
   ) {
-    try {
-      const { id } = await fetchUserProfile(token)
+    const user = await fetchUserProfile(token)
+    if (!user) return ctx.throw(badRequest('Failed to fetch user profile'))
 
-      const attestations = []
-      for (const type of types) {
-        const allowlist = allowlistMap.get(type)
-        if (allowlist?.has(`twitter:${id}`))
-          attestations.push(
-            signAttestationMessage(type, VerificationType.twitter, id)
-          )
-      }
+    const { id } = user
 
-      if (!attestations.length)
-        return ctx.throw(
-          notFound(
-            "Couldn't find the invitation for this Twitter handle. Please, try another one"
-          )
+    const attestations = []
+    for (const type of types) {
+      const allowlist = allowlistMap.get(type)
+      if (allowlist?.has(`twitter:${id}`))
+        attestations.push(
+          signAttestationMessage(type, VerificationType.twitter, id)
         )
-      return Promise.all(attestations)
-    } catch (e) {
-      console.error(e)
-      return ctx.throw(badRequest('Failed to fetch user profile'))
     }
+
+    if (!attestations.length)
+      return ctx.throw(
+        notFound(
+          `Couldn't find the invitation for this Twitter handle. Please, try another one`
+        )
+      )
+
+    return Promise.all(attestations)
   }
 
   @Post('/twitter')
@@ -151,14 +155,85 @@ export default class VerifyKetlController {
     @Ctx() ctx: Context,
     @Body({ required: true }) { token, type }: TwitterBody & AttestationType
   ) {
-    try {
-      const { id } = await fetchUserProfile(token)
+    const user = await fetchUserProfile(token)
+    if (!user) return ctx.throw(badRequest('Failed to fetch user profile'))
+    const { id } = user
 
-      return signAttestationMessage(type, VerificationType.twitter, id)
+    return signAttestationMessage(type, VerificationType.twitter, id)
+  }
+
+  @Post('/balance-unique')
+  @Version('0.2.2')
+  async multipleBalanceAttestation(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    {
+      message,
+      ownerAddress,
+      signature,
+      threshold,
+      tokenAddress = zeroAddress,
+      tokenId,
+      types,
+    }: BalanceUniqueVerifyBody &
+      Signature &
+      AttestationTypeList &
+      OrangeDAOTokenAddress
+  ) {
+    const signerAddress = ethers.utils
+      .verifyMessage(message, signature)
+      .toLowerCase()
+
+    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+      return ctx.throw(badRequest('Invalid ownerAddress'))
+    }
+
+    try {
+      const balance = await getBalance(
+        polygonProvider,
+        ownerAddress,
+        tokenAddress,
+        tokenId
+      )
+      if (balance.lt(threshold)) {
+        return ctx.throw(badRequest('Not enough balance'))
+      }
     } catch (e) {
       console.error(e)
-      return ctx.throw(badRequest('Failed to fetch user profile'))
+      return ctx.throw(badRequest("Can't fetch the balances"))
     }
+
+    const attestations = []
+    for (const type of types) {
+      const allowlist = allowlistMap.get(type)
+      if (allowlist?.has(`orangedao:${ownerAddress}`))
+        attestations.push(
+          signAttestationMessage(
+            type,
+            VerificationType.balance,
+            hexlifyString(ownerAddress.toLowerCase()),
+            threshold,
+            hexlifyString(YC_ALUM_NFT_CONTRACT)
+          )
+        )
+      if (allowlist?.has(`bwlnft:${ownerAddress}`))
+        attestations.push(
+          signAttestationMessage(
+            type,
+            VerificationType.balance,
+            hexlifyString(ownerAddress.toLowerCase()),
+            threshold,
+            hexlifyString(KETL_BWL_NFT_CONTRACT)
+          )
+        )
+    }
+    if (!attestations.length)
+      return ctx.throw(
+        notFound(
+          `Couldn't find the invitation for this wallet. Please, try another one`
+        )
+      )
+    return Promise.all(attestations)
   }
 
   @Post('/balance-unique')
