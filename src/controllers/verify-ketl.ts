@@ -217,7 +217,7 @@ export default class VerifyKetlController {
         )
     }
     if (!attestations.length)
-      return ctx.throw(notFound(handleInvitationError('Twitter wallet')))
+      return ctx.throw(notFound(handleInvitationError('wallet')))
     return Promise.all(attestations)
   }
 
