@@ -195,22 +195,22 @@ export default class VerifyKetlController {
     const attestations = []
     for (const type of types) {
       const allowlist = allowlistMap.get(type)
-      if (allowlist?.has(`orangedao:${ownerAddress}`))
+      if (allowlist?.has(`orangedao:${signerAddress}`))
         attestations.push(
           signAttestationMessage(
             type,
             VerificationType.balance,
-            hexlifyString(ownerAddress.toLowerCase()),
+            hexlifyString(signerAddress),
             threshold,
             hexlifyString(YC_ALUM_NFT_CONTRACT)
           )
         )
-      if (allowlist?.has(`bwlnft:${ownerAddress}`))
+      if (allowlist?.has(`bwlnft:${signerAddress}`))
         attestations.push(
           signAttestationMessage(
             type,
             VerificationType.balance,
-            hexlifyString(ownerAddress.toLowerCase()),
+            hexlifyString(signerAddress),
             threshold,
             hexlifyString(KETL_BWL_NFT_CONTRACT)
           )
