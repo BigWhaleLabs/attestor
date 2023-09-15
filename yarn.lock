@@ -1729,7 +1729,7 @@ __metadata:
     "@types/uuid": ^8.3.4
     "@zk-kit/incremental-merkle-tree": ^1.0.0
     amala: ^8.0.2
-    axios: ^1.2.0
+    axios: ^1.5.0
     circomlibjs: ^0.1.7
     dotenv: ^16.0.3
     envalid: ^7.3.1
@@ -1755,14 +1755,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "axios@npm:1.2.0"
+"axios@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "axios@npm:1.5.0"
   dependencies:
     follow-redirects: ^1.15.0
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: f08ce214e957dfde45b837f8d3c7861424608fb7df32faa638835e338782a9f4c0b05074e92e0e8dcca3a1e6250112fbbe1b15a6b21104da633d84745bbb79cc
+  checksum: e7405a5dbbea97760d0e6cd58fecba311b0401ddb4a8efbc4108f5537da9b3f278bde566deb777935a960beec4fa18e7b8353881f2f465e4f2c0e949fead35be
   languageName: node
   linkType: hard
 
