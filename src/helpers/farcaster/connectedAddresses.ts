@@ -1,5 +1,7 @@
-import axios from 'axios'
+import { isAxiosError } from 'axios'
+import axiosWithCache from '@/helpers/axiosWithCache'
 import checkIfPrimary from '@/helpers/cluster/checkIfPrimary'
+import sleep from '@/helpers/sleep'
 
 export const faddressToConnectedAddresses = {} as {
   [faddress: string]: string[]
@@ -7,11 +9,13 @@ export const faddressToConnectedAddresses = {} as {
 
 export async function fetchConnectedAddress(address: string) {
   checkIfPrimary()
-  const { data } = await axios.get<
+  const { data } = await axiosWithCache.get<
     {
       connectedAddress: string
     }[]
-  >(`https://searchcaster.xyz/api/profiles?address=${address}`)
+  >(`https://searchcaster.xyz/api/profiles?address=${address}`, {
+    id: `farcaster-profiles-${address}`,
+  })
   const connectedAddresses = data.map(
     ({ connectedAddress }) => connectedAddress
   )
@@ -36,6 +40,8 @@ export async function fetchConnectedAddresses(addresses: string[]) {
         'Error fetching connected addresses',
         error instanceof Error ? error.message : error
       )
+      if (isAxiosError(error) && error.response?.status === 429)
+        await sleep(5000)
       i -= step
     }
   }

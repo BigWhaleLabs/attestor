@@ -13,3 +13,5 @@ pot/OwnershipChecker_final.zkey
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+.node-persist/*

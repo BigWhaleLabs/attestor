@@ -4,6 +4,7 @@ import {
   ETH_NETWORK,
   ETH_RPC,
   ETH_RPC_MAINNET,
+  PROD_KETL_ATTESTATION_CONTRACT,
 } from '@big-whale-labs/constants'
 import { cleanEnv, num, str } from 'envalid'
 import { cwd } from 'process'
@@ -15,11 +16,20 @@ dotenv.config({ path: resolve(cwd(), '.env') })
 export default cleanEnv(process.env, {
   ECDSA_PRIVATE_KEY: str(),
   EDDSA_PRIVATE_KEY: str(),
+  ETH_MUMBAI_NETWORK: str({ default: ETH_MUMBAI_NETWORK }),
   ETH_NETWORK: str({ default: ETH_NETWORK }),
   ETH_POLYGON_NETWORK: str({ default: ETH_MUMBAI_NETWORK }),
   ETH_RPC: str({ default: ETH_RPC }),
   ETH_RPC_MAINNET: str({ default: ETH_RPC_MAINNET }),
+  ETH_RPC_MUMBAI: str({ default: ETH_MUMBAI_NETWORK }),
   ETH_RPC_POLYGON: str(),
+  KETL_ATTESTATION_CONTRACT_ADDRESS: str({
+    default: PROD_KETL_ATTESTATION_CONTRACT,
+  }),
+  KETL_HASHES_SOURCE: str({
+    default:
+      'https://raw.githubusercontent.com/BigWhaleLabs/ketl-attestation-token/main',
+  }),
   PORT: num({ default: 1337 }),
   SMTP_PASS: str(),
   SMTP_USER: str(),
