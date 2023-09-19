@@ -16,8 +16,9 @@ import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
 import VerificationType from '@/models/VerificationType'
+import checkInvite from '@/helpers/ketl/checkInvite'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
-import getAllowlistMap from '@/helpers/getAllowlistMap'
+import getAttestationHash from '@/helpers/signatures/getAttestationHash'
 import getBalance from '@/helpers/getBalance'
 import getEmailDomain from '@/helpers/getEmailDomain'
 import handleInvitationError from '@/helpers/handleInvitationError'
@@ -26,21 +27,19 @@ import sendEmail from '@/helpers/sendEmail'
 import signAttestationMessage from '@/helpers/signatures/signAttestationMessage'
 import zeroAddress from '@/models/zeroAddress'
 
-const allowlistMap = getAllowlistMap()
-
 @Controller('/verify-ketl')
 export default class VerifyKetlController {
   @Version('0.2.2')
   @Post('/token')
-  multipleToken(
+  async multipleToken(
     @Ctx() ctx: Context,
     @Body({ required: true }) { token, types }: AttestationTypeList & Token
   ) {
     const attestations = []
     for (const type of types) {
-      const allowlist = allowlistMap.get(type)
-      if (allowlist?.has(`token:${token}`))
-        attestations.push(signAttestationMessage(type, hexlifyString(token)))
+      const attestationHash = await getAttestationHash(hexlifyString(token))
+      const record = await signAttestationMessage(type, attestationHash)
+      if (await checkInvite(type, attestationHash)) attestations.push(record)
     }
 
     if (!attestations.length)
@@ -63,13 +62,16 @@ export default class VerifyKetlController {
     const secret = []
 
     for (const type of types) {
-      const allowlist = allowlistMap.get(type)
-      if (!allowlist?.has(`email:${email}`)) continue
-      const { message, signature } = await signAttestationMessage(
-        type,
+      const attestationHash = await getAttestationHash(
         VerificationType.email,
         hexlifyString(email)
       )
+      const { message, signature } = await signAttestationMessage(
+        type,
+        attestationHash
+      )
+      const hasInvite = await checkInvite(type, attestationHash)
+      if (!hasInvite) continue
       if (secret.length === 0) {
         const attestationHash = message[1]
         secret.push(attestationHash)
@@ -95,13 +97,12 @@ export default class VerifyKetlController {
     @Body({ required: true })
     { email, type }: AttestationType & Email
   ) {
-    const { message, signature } = await signAttestationMessage(
-      type,
+    const attestationHash = await getAttestationHash(
       VerificationType.email,
       hexlifyString(email)
     )
+    const { signature } = await signAttestationMessage(type, attestationHash)
     const domain = getEmailDomain(email)
-    const attestationHash = message[1]
 
     void sendEmail({
       domain,
@@ -126,11 +127,13 @@ export default class VerifyKetlController {
 
     const attestations = []
     for (const type of types) {
-      const allowlist = allowlistMap.get(type)
-      if (allowlist?.has(`twitter:${id}`))
-        attestations.push(
-          signAttestationMessage(type, VerificationType.twitter, id)
-        )
+      const attestationHash = await getAttestationHash(
+        VerificationType.twitter,
+        id
+      )
+      const record = await signAttestationMessage(type, attestationHash)
+      const hasInvite = await checkInvite(type, attestationHash)
+      if (hasInvite) attestations.push(record)
     }
 
     if (!attestations.length)
@@ -148,7 +151,11 @@ export default class VerifyKetlController {
     if (!user) return ctx.throw(badRequest('Failed to fetch user profile'))
     const { id } = user
 
-    return signAttestationMessage(type, VerificationType.twitter, id)
+    const attestationHash = await getAttestationHash(
+      VerificationType.twitter,
+      id
+    )
+    return signAttestationMessage(type, attestationHash)
   }
 
   @Post('/balance-unique')
@@ -194,27 +201,17 @@ export default class VerifyKetlController {
 
     const attestations = []
     for (const type of types) {
-      const allowlist = allowlistMap.get(type)
-      if (allowlist?.has(`orangedao:${signerAddress}`))
-        attestations.push(
-          signAttestationMessage(
-            type,
-            VerificationType.balance,
-            hexlifyString(signerAddress),
-            threshold,
-            hexlifyString(YC_ALUM_NFT_CONTRACT)
-          )
+      for (const contract of [YC_ALUM_NFT_CONTRACT, KETL_BWL_NFT_CONTRACT]) {
+        const attestationHash = await getAttestationHash(
+          VerificationType.balance,
+          hexlifyString(signerAddress),
+          threshold,
+          hexlifyString(contract)
         )
-      if (allowlist?.has(`bwlnft:${signerAddress}`))
-        attestations.push(
-          signAttestationMessage(
-            type,
-            VerificationType.balance,
-            hexlifyString(signerAddress),
-            threshold,
-            hexlifyString(KETL_BWL_NFT_CONTRACT)
-          )
-        )
+        const record = await signAttestationMessage(type, attestationHash)
+        const hasInvite = await checkInvite(type, attestationHash)
+        if (hasInvite) attestations.push(record)
+      }
     }
     if (!attestations.length)
       return ctx.throw(notFound(handleInvitationError('wallet')))
@@ -258,12 +255,13 @@ export default class VerifyKetlController {
       return ctx.throw(badRequest("Can't fetch the balances"))
     }
 
-    return signAttestationMessage(
-      type,
+    const attestationHash = await getAttestationHash(
       VerificationType.balance,
       hexlifyString(ownerAddress.toLowerCase()),
       threshold,
       hexlifyString(tokenAddress)
     )
+
+    return signAttestationMessage(type, attestationHash)
   }
 }

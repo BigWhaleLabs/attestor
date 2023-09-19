@@ -67,6 +67,7 @@ And you should be good to go! Feel free to fork and submit pull requests.
 | `ETH_RPC_POLYGON`     | Polygon node RPC URI (defaults to @bwl/constants)                          |
 | `DOMAIN`              | Domain name for caddy, DNS should point at the IP where the code is hosted |
 | `ENVIRONMENT`         | Environment name (defaults to `development`)                               |
+| `KETL_HASHES_SOURCE`  | Link to merkle tree hashes for Ketl                                        |
 
 Also, please, consider looking at `.env.sample`.
 

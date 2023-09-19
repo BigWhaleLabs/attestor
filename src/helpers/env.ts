@@ -20,6 +20,10 @@ export default cleanEnv(process.env, {
   ETH_RPC: str({ default: ETH_RPC }),
   ETH_RPC_MAINNET: str({ default: ETH_RPC_MAINNET }),
   ETH_RPC_POLYGON: str(),
+  KETL_HASHES_SOURCE: str({
+    default:
+      'https://raw.githubusercontent.com/BigWhaleLabs/ketl-attestation-token/main',
+  }),
   PORT: num({ default: 1337 }),
   SMTP_PASS: str(),
   SMTP_USER: str(),
