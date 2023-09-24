@@ -35,13 +35,14 @@ export default async function ({
       : scEmail({ domain, secret })
 
     const from = forKetl ? 'Ketl' : 'SealCred'
-
+    console.log(`Sending email to ${to}`)
     await emailer.sendMail({
       from: `"${from}" <${user}>`,
       html,
       subject,
       to,
     })
+    console.log(`Email sent to ${to}`)
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
   }
