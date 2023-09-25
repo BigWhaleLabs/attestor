@@ -87,7 +87,7 @@ export default class VerifyKetlController {
       domain,
       forKetl: true,
       secret: secret.join(''),
-      subject: "Here's your token!",
+      subject: "Here's your signup code!",
       to: email,
     })
   }
@@ -108,7 +108,7 @@ export default class VerifyKetlController {
       domain,
       forKetl: true,
       secret: `${type}${attestationHash}${signature}`,
-      subject: "Here's your token!",
+      subject: "Here's signup code!",
       to: email,
     })
   }
