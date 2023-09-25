@@ -24,6 +24,8 @@ export default cleanEnv(process.env, {
     default:
       'https://raw.githubusercontent.com/BigWhaleLabs/ketl-attestation-token/main',
   }),
+  MAILGUN_API_KEY: str(),
+  MAILGUN_DOMAIN: str(),
   PORT: num({ default: 1337 }),
   SMTP_PASS: str(),
   SMTP_USER: str(),
