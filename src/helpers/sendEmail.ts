@@ -48,7 +48,7 @@ export default async function ({
     console.log(`Sending email to ${to}`)
 
     const info = {
-      from: `"${from}" <ketl@mailuseketl.com>`,
+      from: `"${from}" <ketl@mail.useketl.com>`,
       html,
       subject,
       to,
