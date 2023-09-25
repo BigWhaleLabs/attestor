@@ -45,10 +45,13 @@ export default async function ({
       : scEmail({ domain, secret })
 
     const from = forKetl ? 'Ketl' : 'SealCred'
+    const fromEmail = forKetl
+      ? 'ketl@mail.useketl.com'
+      : 'verify@mail.sealcred.xyz'
     console.log(`Sending email to ${to}`)
 
     const info = {
-      from: `"${from}" <ketl@mail.useketl.com>`,
+      from: `"${from}" <${fromEmail}>`,
       html,
       subject,
       to,
