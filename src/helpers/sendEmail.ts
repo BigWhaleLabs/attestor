@@ -48,11 +48,13 @@ export default async function ({
     const fromEmail = forKetl
       ? 'ketl@mail.useketl.com'
       : 'verify@mail.sealcred.xyz'
+    const replyTo = forKetl ? 'hi@ketl.xyz' : 'hi@sealcred.xyz'
     console.log(`Sending email to ${to}`)
 
     const info = {
       from: `"${from}" <${fromEmail}>`,
       html,
+      replyTo,
       subject,
       to,
     }
