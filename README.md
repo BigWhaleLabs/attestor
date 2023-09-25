@@ -68,6 +68,8 @@ And you should be good to go! Feel free to fork and submit pull requests.
 | `DOMAIN`              | Domain name for caddy, DNS should point at the IP where the code is hosted |
 | `ENVIRONMENT`         | Environment name (defaults to `development`)                               |
 | `KETL_HASHES_SOURCE`  | Link to merkle tree hashes for Ketl                                        |
+| `MAILGUN_API_KEY`     | Mailgun API key                                                            |
+| `MAILGUN_DOMAIN`      | Mailgun Domain                                                             |
 
 Also, please, consider looking at `.env.sample`.
 

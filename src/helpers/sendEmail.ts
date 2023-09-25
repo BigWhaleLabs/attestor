@@ -1,3 +1,4 @@
+import * as mg from 'nodemailer-mailgun-transport'
 import { createTransport } from 'nodemailer'
 import { generateTokenHtml as scEmail } from '@big-whale-labs/seal-cred-email'
 import env from '@/helpers/env'
@@ -15,6 +16,15 @@ const emailer = createTransport({
   port: 465,
   secure: true,
 })
+
+const emailerMailgun = createTransport(
+  mg({
+    auth: {
+      api_key: env.MAILGUN_API_KEY,
+      domain: env.MAILGUN_DOMAIN,
+    },
+  })
+)
 
 export default async function ({
   domain,
@@ -35,13 +45,20 @@ export default async function ({
       : scEmail({ domain, secret })
 
     const from = forKetl ? 'Ketl' : 'SealCred'
+    const fromEmail = forKetl
+      ? 'ketl@mail.useketl.com'
+      : 'verify@mail.sealcred.xyz'
     console.log(`Sending email to ${to}`)
-    await emailer.sendMail({
-      from: `"${from}" <${user}>`,
+
+    const info = {
+      from: `"${from}" <${fromEmail}>`,
       html,
       subject,
       to,
-    })
+    }
+
+    forKetl ? await emailerMailgun.sendMail(info) : await emailer.sendMail(info)
+
     console.log(`Email sent to ${to}`)
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
