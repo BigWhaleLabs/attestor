@@ -11,7 +11,6 @@ import AttestationType from '@/validators/AttestationType'
 import AttestationTypeList from '@/validators/AttestationTypeList'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import Email from '@/validators/Email'
-import OwnerAddress from '@/validators/OwnerAddress'
 import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
@@ -163,7 +162,7 @@ export default class VerifyKetlController {
   async multipleBalanceAttestationSimplified(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    body: OwnerAddress & Signature & AttestationTypeList
+    body: Signature & AttestationTypeList
   ) {
     const { message, signature, types } = body
     const signerAddress = ethers.utils
