@@ -187,12 +187,14 @@ export default class VerifyKetlController {
           const hasInvite = await checkInvite(type, attestationHash)
           if (hasInvite) attestations.push(record)
         } catch (e) {
-          console.log(e)
+          console.error(e)
         }
       }
     }
+
     if (!attestations.length)
       return ctx.throw(notFound(handleInvitationError('wallet')))
+
     return Promise.all(attestations)
   }
 
