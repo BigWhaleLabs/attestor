@@ -11,7 +11,6 @@ import AttestationType from '@/validators/AttestationType'
 import AttestationTypeList from '@/validators/AttestationTypeList'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import Email from '@/validators/Email'
-import OrangeDAOTokenAddress from '@/validators/OrangeDAOTokenAddress'
 import OwnerAddress from '@/validators/OwnerAddress'
 import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
@@ -160,24 +159,16 @@ export default class VerifyKetlController {
   }
 
   @Post('/balance-unique')
-  @Version('0.2.3')
+  @Version('0.2.2')
   async multipleBalanceAttestationSimplified(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    {
-      message,
-      ownerAddress,
-      signature,
-      types,
-    }: OwnerAddress & Signature & AttestationTypeList
+    body: OwnerAddress & Signature & AttestationTypeList
   ) {
+    const { message, signature, types } = body
     const signerAddress = ethers.utils
       .verifyMessage(message, signature)
       .toLowerCase()
-
-    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
-      return ctx.throw(badRequest('Invalid ownerAddress'))
-    }
 
     const attestations = []
     for (const type of types) {
@@ -186,12 +177,6 @@ export default class VerifyKetlController {
         KETL_BWL_NFT_CONTRACT,
       ]) {
         try {
-          const balance = await getBalance(
-            polygonProvider,
-            ownerAddress,
-            tokenAddress
-          )
-          if (balance.lt(1)) continue
           const attestationHash = await getAttestationHash(
             VerificationType.balance,
             hexlifyString(signerAddress),
@@ -204,66 +189,6 @@ export default class VerifyKetlController {
         } catch (e) {
           console.log(e)
         }
-      }
-    }
-    if (!attestations.length)
-      return ctx.throw(notFound(handleInvitationError('wallet')))
-    return Promise.all(attestations)
-  }
-
-  @Post('/balance-unique')
-  @Version('0.2.2')
-  async multipleBalanceAttestation(
-    @Ctx() ctx: Context,
-    @Body({ required: true })
-    {
-      message,
-      ownerAddress,
-      signature,
-      threshold,
-      tokenAddress = zeroAddress,
-      tokenId,
-      types,
-    }: BalanceUniqueVerifyBody &
-      Signature &
-      AttestationTypeList &
-      OrangeDAOTokenAddress
-  ) {
-    const signerAddress = ethers.utils
-      .verifyMessage(message, signature)
-      .toLowerCase()
-
-    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
-      return ctx.throw(badRequest('Invalid ownerAddress'))
-    }
-
-    try {
-      const balance = await getBalance(
-        polygonProvider,
-        ownerAddress,
-        tokenAddress,
-        tokenId
-      )
-      if (balance.lt(threshold)) {
-        return ctx.throw(badRequest('Not enough balance'))
-      }
-    } catch (e) {
-      console.error(e)
-      return ctx.throw(badRequest("Can't fetch the balances"))
-    }
-
-    const attestations = []
-    for (const type of types) {
-      for (const contract of [YC_ALUM_NFT_CONTRACT, KETL_BWL_NFT_CONTRACT]) {
-        const attestationHash = await getAttestationHash(
-          VerificationType.balance,
-          hexlifyString(signerAddress),
-          threshold,
-          hexlifyString(contract)
-        )
-        const record = await signAttestationMessage(type, attestationHash)
-        const hasInvite = await checkInvite(type, attestationHash)
-        if (hasInvite) attestations.push(record)
       }
     }
     if (!attestations.length)
