@@ -164,18 +164,21 @@ export default class VerifyKetlController {
   async multipleBalanceAttestationSimplified(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    {
-      message,
-      ownerAddress,
-      signature,
-      types,
-    }: OwnerAddress & Signature & AttestationTypeList
+    body: OwnerAddress & Signature & AttestationTypeList
   ) {
-    const signerAddress = ethers.utils
-      .verifyMessage(message, signature)
-      .toLowerCase()
+    const { message, ownerAddress, signature, types } = body
+    let signerAddress: string
 
-    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+    try {
+      signerAddress = ethers.utils
+        .verifyMessage(message, signature)
+        .toLowerCase()
+
+      if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+        return ctx.throw(badRequest('Invalid ownerAddress'))
+      }
+    } catch (e) {
+      console.error(e)
       return ctx.throw(badRequest('Invalid ownerAddress'))
     }
 
@@ -202,12 +205,14 @@ export default class VerifyKetlController {
           const hasInvite = await checkInvite(type, attestationHash)
           if (hasInvite) attestations.push(record)
         } catch (e) {
-          console.log(e)
+          console.error(e)
         }
       }
     }
+
     if (!attestations.length)
       return ctx.throw(notFound(handleInvitationError('wallet')))
+
     return Promise.all(attestations)
   }
 
