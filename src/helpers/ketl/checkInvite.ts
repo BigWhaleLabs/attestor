@@ -6,7 +6,7 @@ export default async function checkInvite(
   hash: string
 ) {
   const { data } = await axios.get<boolean>(
-    `${env.KETL_INVITES_BACKEND}/merkle/hash/attestationType=${attestationType}&hash=${hash}`
+    `${env.KETL_INVITES_BACKEND}/merkle/hash?attestationType=${attestationType}&hash=${hash}`
   )
 
   return data
