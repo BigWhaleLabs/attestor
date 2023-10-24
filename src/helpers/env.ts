@@ -4,6 +4,7 @@ import {
   ETH_NETWORK,
   ETH_RPC,
   ETH_RPC_MAINNET,
+  KETL_INVITES_BACKEND,
 } from '@big-whale-labs/constants'
 import { cleanEnv, num, str } from 'envalid'
 import { cwd } from 'process'
@@ -20,9 +21,8 @@ export default cleanEnv(process.env, {
   ETH_RPC: str({ default: ETH_RPC }),
   ETH_RPC_MAINNET: str({ default: ETH_RPC_MAINNET }),
   ETH_RPC_POLYGON: str(),
-  KETL_HASHES_SOURCE: str({
-    default:
-      'https://raw.githubusercontent.com/BigWhaleLabs/ketl-attestation-token/main',
+  KETL_INVITES_BACKEND: str({
+    default: KETL_INVITES_BACKEND,
   }),
   MAILGUN_API_KEY: str(),
   MAILGUN_DOMAIN: str(),
