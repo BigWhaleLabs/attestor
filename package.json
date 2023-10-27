@@ -18,7 +18,7 @@
     "docker-update-image": "docker build -t bigwhalelabs/attestor -f Dockerfile.backend.production . && docker push bigwhalelabs/attestor"
   },
   "dependencies": {
-    "@big-whale-labs/constants": "^0.2.15",
+    "@big-whale-labs/constants": "^0.2.25",
     "@big-whale-labs/ketl-email": "^0.3.1",
     "@big-whale-labs/seal-cred-email": "^1.1.2",
     "@hapi/boom": "^10.0.0",
