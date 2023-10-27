@@ -34,9 +34,9 @@ __metadata:
   linkType: hard
 
 "@big-whale-labs/constants@npm:^0.2.15":
-  version: 0.2.15
-  resolution: "@big-whale-labs/constants@npm:0.2.15"
-  checksum: d67041f388f80d807e19d8360754cc3b72db6ba3673951a5b6553b774ab3bbf77d7e699ffff9aae27d4d5f39837657e63313f7f0f7e6f94639f63a0ee2cbb6b4
+  version: 0.2.26
+  resolution: "@big-whale-labs/constants@npm:0.2.26"
+  checksum: 78cf8ad50032104184f8483d58ad0223dff3b4ab431192f833ca5053f9bfccd3785a16c8a74d1f508839b8a6d019718c5af48bc0d9e2fd5e6907731bc6cfc815
   languageName: node
   linkType: hard
 
