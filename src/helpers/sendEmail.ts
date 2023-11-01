@@ -1,8 +1,8 @@
 import * as mg from 'nodemailer-mailgun-transport'
 import { createTransport } from 'nodemailer'
+import { inviteCode } from '@big-whale-labs/ketl-email'
 import { generateTokenHtml as scEmail } from '@big-whale-labs/seal-cred-email'
 import env from '@/helpers/env'
-import ketlEmail from '@big-whale-labs/ketl-email'
 
 const user = env.SMTP_USER
 const pass = env.SMTP_PASS
@@ -41,7 +41,7 @@ export default async function ({
 }) {
   try {
     const { html } = forKetl
-      ? ketlEmail({ domain, secret })
+      ? inviteCode({ domain, secret })
       : scEmail({ domain, secret })
 
     const from = forKetl ? 'Ketl' : 'SealCred'
