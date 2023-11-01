@@ -10,10 +10,5 @@ export default async function checkInvite(
     { cache: false }
   )
 
-  console.log(
-    `checkInvite /merkle/hash?attestationType=${attestationType}&hash=${hash}`,
-    data
-  )
-
   return data
 }
