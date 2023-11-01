@@ -1,4 +1,4 @@
-import axiosWithCache from 'helpers/axiosWithCache'
+import axiosWithCache from '@/helpers/axiosWithCache'
 import env from '@/helpers/env'
 
 export default async function checkInvite(
