@@ -9,5 +9,10 @@ export default async function checkInvite(
     `${env.KETL_INVITES_BACKEND}/merkle/hash?attestationType=${attestationType}&hash=${hash}`
   )
 
+  console.log(
+    `checkInvite /merkle/hash?attestationType=${attestationType}&hash=${hash}`,
+    data
+  )
+
   return data
 }
