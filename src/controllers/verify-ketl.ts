@@ -11,7 +11,6 @@ import AttestationType from '@/validators/AttestationType'
 import AttestationTypeList from '@/validators/AttestationTypeList'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import Email from '@/validators/Email'
-import OrangeDAOTokenAddress from '@/validators/OrangeDAOTokenAddress'
 import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
@@ -160,61 +159,41 @@ export default class VerifyKetlController {
 
   @Post('/balance-unique')
   @Version('0.2.2')
-  async multipleBalanceAttestation(
+  async multipleBalanceAttestationSimplified(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    {
-      message,
-      ownerAddress,
-      signature,
-      threshold,
-      tokenAddress = zeroAddress,
-      tokenId,
-      types,
-    }: BalanceUniqueVerifyBody &
-      Signature &
-      AttestationTypeList &
-      OrangeDAOTokenAddress
+    body: Signature & AttestationTypeList
   ) {
+    const { message, signature, types } = body
     const signerAddress = ethers.utils
       .verifyMessage(message, signature)
       .toLowerCase()
 
-    if (signerAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
-      return ctx.throw(badRequest('Invalid ownerAddress'))
-    }
-
-    try {
-      const balance = await getBalance(
-        polygonProvider,
-        ownerAddress,
-        tokenAddress,
-        tokenId
-      )
-      if (balance.lt(threshold)) {
-        return ctx.throw(badRequest('Not enough balance'))
-      }
-    } catch (e) {
-      console.error(e)
-      return ctx.throw(badRequest("Can't fetch the balances"))
-    }
-
     const attestations = []
     for (const type of types) {
-      for (const contract of [YC_ALUM_NFT_CONTRACT, KETL_BWL_NFT_CONTRACT]) {
-        const attestationHash = await getAttestationHash(
-          VerificationType.balance,
-          hexlifyString(signerAddress),
-          threshold,
-          hexlifyString(contract)
-        )
-        const record = await signAttestationMessage(type, attestationHash)
-        const hasInvite = await checkInvite(type, attestationHash)
-        if (hasInvite) attestations.push(record)
+      for (const tokenAddress of [
+        YC_ALUM_NFT_CONTRACT,
+        KETL_BWL_NFT_CONTRACT,
+      ]) {
+        try {
+          const attestationHash = await getAttestationHash(
+            VerificationType.balance,
+            hexlifyString(signerAddress),
+            1,
+            hexlifyString(tokenAddress)
+          )
+          const record = await signAttestationMessage(type, attestationHash)
+          const hasInvite = await checkInvite(type, attestationHash)
+          if (hasInvite) attestations.push(record)
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
+
     if (!attestations.length)
       return ctx.throw(notFound(handleInvitationError('wallet')))
+
     return Promise.all(attestations)
   }
 
