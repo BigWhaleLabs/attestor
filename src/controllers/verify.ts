@@ -73,7 +73,7 @@ export default class VerifyController {
       const domainBytes = padZeroesOnRightUint8(utils.toUtf8Bytes(domain), 90)
       const signature = await eddsaSigFromString(domainBytes)
       void sendEmail({
-        domain,
+        attestationType: Number(signature[0]),
         secret: signature,
         subject: "Here's your token!",
         to: email,
