@@ -19,7 +19,6 @@ import checkInvite from '@/helpers/ketl/checkInvite'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getAttestationHash from '@/helpers/signatures/getAttestationHash'
 import getBalance from '@/helpers/getBalance'
-import getEmailDomain from '@/helpers/getEmailDomain'
 import handleInvitationError from '@/helpers/handleInvitationError'
 import hexlifyString from '@/helpers/hexlifyString'
 import sendEmail from '@/helpers/sendEmail'
@@ -56,8 +55,9 @@ export default class VerifyKetlController {
   async sendMultipleEmailAttestation(
     @Ctx() ctx: Context,
     @Body({ required: true })
-    { email, types }: AttestationTypeList & Email
+    body: AttestationTypeList & Email
   ) {
+    const { email, types } = body
     const secret = []
 
     for (const type of types) {
@@ -81,12 +81,12 @@ export default class VerifyKetlController {
     if (!secret.length)
       return ctx.throw(notFound(handleInvitationError('email')))
 
-    const domain = getEmailDomain(email)
+    const fullSecret = secret.join('')
+
     void sendEmail({
-      domain,
       forKetl: true,
-      secret: secret.join(''),
-      subject: "Here's your signup code!",
+      secret: fullSecret,
+      subject: "Here's your invite code!",
       to: email,
     })
   }
@@ -94,20 +94,19 @@ export default class VerifyKetlController {
   @Post('/email-unique')
   async sendUniqueEmail(
     @Body({ required: true })
-    { email, type }: AttestationType & Email
+    body: AttestationType & Email
   ) {
+    const { email, type } = body
     const attestationHash = await getAttestationHash(
       VerificationType.email,
       hexlifyString(email)
     )
     const { signature } = await signAttestationMessage(type, attestationHash)
-    const domain = getEmailDomain(email)
 
     void sendEmail({
-      domain,
       forKetl: true,
       secret: `${type}${attestationHash}${signature}`,
-      subject: "Here's signup code!",
+      subject: "Here's your invite code!",
       to: email,
     })
   }
