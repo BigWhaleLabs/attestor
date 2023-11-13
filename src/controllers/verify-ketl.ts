@@ -84,10 +84,9 @@ export default class VerifyKetlController {
     const fullSecret = secret.join('')
 
     void sendEmail({
-      attestationType: Number(fullSecret[0]),
       forKetl: true,
       secret: fullSecret,
-      subject: "Here's your signup code!",
+      subject: "Here's your invite code!",
       to: email,
     })
   }
@@ -105,10 +104,9 @@ export default class VerifyKetlController {
     const { signature } = await signAttestationMessage(type, attestationHash)
 
     void sendEmail({
-      attestationType: type,
       forKetl: true,
       secret: `${type}${attestationHash}${signature}`,
-      subject: "Here's signup code!",
+      subject: "Here's your invite code!",
       to: email,
     })
   }
