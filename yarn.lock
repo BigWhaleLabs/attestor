@@ -40,9 +40,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@big-whale-labs/ketl-email@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@big-whale-labs/ketl-email@npm:0.4.0"
+"@big-whale-labs/ketl-email@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@big-whale-labs/ketl-email@npm:0.4.1"
   dependencies:
     dotenv: ^16.3.1
     envalid: ^7.3.1
@@ -52,7 +52,7 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
     source-map-support: ^0.5.21
-  checksum: 71c354473967859b43d96d0cfe2cfeb41c3ff23064022686b909ce1513af37c4fae2c7e41ef1bcdae320f7f0fc1f61f48bc9effa5b3fcf2b9f9c36e68a7b3053
+  checksum: 2781cebcf07feac50de2d7890d14c159444f772e51be1832ca70ed6918dcdc8968189dfa74e3f043263ffd171da080b7c582a13d044df60f0e4a22572edfffb8
   languageName: node
   linkType: hard
 
@@ -1741,7 +1741,7 @@ __metadata:
   dependencies:
     "@big-whale-labs/bwl-eslint-backend": ^1.0.3
     "@big-whale-labs/constants": ^0.2.25
-    "@big-whale-labs/ketl-email": ^0.4.0
+    "@big-whale-labs/ketl-email": ^0.4.1
     "@big-whale-labs/prettier-config": ^1.1.3
     "@big-whale-labs/seal-cred-email": ^1.1.2
     "@hapi/boom": ^10.0.0

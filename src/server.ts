@@ -16,7 +16,7 @@ void (async () => {
   await initStorage()
   axiosWithCache.storage = buildPersistedStorage()
 
-  if (Cluster.isPrimary) {
+  if (!Cluster.isPrimary) {
     console.log(`Number of CPUs is ${totalCPUs}`)
     console.log(`Primary ${process.pid} is running`)
 
