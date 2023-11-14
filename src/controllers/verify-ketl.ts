@@ -1,4 +1,4 @@
-import { Body, Controller, Ctx, Post, Version } from 'amala'
+import { Body, Controller, Ctx, Flow, Post, Version } from 'amala'
 import { Context } from 'vm'
 import {
   KETL_BWL_NFT_CONTRACT,
@@ -11,10 +11,12 @@ import AttestationType from '@/validators/AttestationType'
 import AttestationTypeList from '@/validators/AttestationTypeList'
 import BalanceUniqueVerifyBody from '@/validators/BalanceUniqueVerifyBody'
 import Email from '@/validators/Email'
+import SignValidator from '@/validators/SignValidator'
 import Signature from '@/validators/Signature'
 import Token from '@/validators/Token'
 import TwitterBody from '@/validators/TwitterBody'
 import VerificationType from '@/models/VerificationType'
+import authenticate from '@/helpers/authenticate'
 import checkInvite from '@/helpers/ketl/checkInvite'
 import fetchUserProfile from '@/helpers/twitter/fetchUserProfile'
 import getAttestationHash from '@/helpers/signatures/getAttestationHash'
@@ -48,6 +50,38 @@ export default class VerifyKetlController {
   @Post('/token')
   token(@Body({ required: true }) { token, type }: AttestationType & Token) {
     return signAttestationMessage(type, hexlifyString(token))
+  }
+
+  @Post('/sign')
+  @Flow(authenticate)
+  @Version('0.2.2')
+  async sign(
+    @Ctx() ctx: Context,
+    @Body({ required: true })
+    body: SignValidator
+  ) {
+    const { hash, types } = body
+    const secretParts = []
+
+    for (const type of types) {
+      const { message, signature } = await signAttestationMessage(type, hash)
+      const hasInvite = await checkInvite(type, hash)
+      if (!hasInvite) continue
+      if (secretParts.length === 0) {
+        const attestationHash = message[1]
+        secretParts.push(attestationHash)
+      }
+      secretParts.push(`t${type}${signature}`)
+    }
+
+    if (!secretParts.length)
+      return ctx.throw(notFound(handleInvitationError('email')))
+
+    const secret = secretParts.join('')
+
+    return {
+      secret,
+    }
   }
 
   @Post('/email-unique')
