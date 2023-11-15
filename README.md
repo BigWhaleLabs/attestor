@@ -70,6 +70,7 @@ And you should be good to go! Feel free to fork and submit pull requests.
 | `KETL_INVITES_BACKEND` | Link to merkle tree hashes for Ketl                                        |
 | `MAILGUN_API_KEY`      | Mailgun API key                                                            |
 | `MAILGUN_DOMAIN`       | Mailgun Domain                                                             |
+| `SECRET`               | Bearer token                                                               |
 
 Also, please, consider looking at `.env.sample`.
 

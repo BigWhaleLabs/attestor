@@ -27,6 +27,7 @@ export default cleanEnv(process.env, {
   MAILGUN_API_KEY: str(),
   MAILGUN_DOMAIN: str(),
   PORT: num({ default: 1337 }),
+  SECRET: str(),
   SMTP_PASS: str(),
   SMTP_USER: str(),
 })
