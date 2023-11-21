@@ -155,7 +155,7 @@ export default class VerifyKetlController {
     const user = await fetchUserProfile(token)
     if (!user) return ctx.throw(badRequest('Failed to fetch user profile'))
 
-    const { id } = user
+    const { id, username } = user
 
     const attestations = []
     for (const type of types) {
@@ -166,6 +166,17 @@ export default class VerifyKetlController {
       const record = await signAttestationMessage(type, attestationHash)
       const hasInvite = await checkInvite(type, attestationHash)
       if (hasInvite) attestations.push(record)
+
+      const attestationHashHandle = await getAttestationHash(
+        VerificationType.twitterHandle,
+        hexlifyString(username)
+      )
+      const recordHandle = await signAttestationMessage(
+        type,
+        attestationHashHandle
+      )
+      const hasInviteHandle = await checkInvite(type, attestationHashHandle)
+      if (hasInviteHandle) attestations.push(recordHandle)
     }
 
     if (!attestations.length)
